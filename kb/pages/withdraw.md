@@ -1,5 +1,5 @@
 # How to Withdraw
-Source: https://valetax.com/how-to-withdraw/
+Source: https://valetax.com/how-to-withdraw/ (snapshot 2026-11-16)
 
 ## [withdraw#steps] How to Withdraw: overview and steps
 We’ve made fund withdrawals easy and instant, providing you with the ultimate convenience and assurance you deserve Login Now

@@ -48,6 +48,9 @@ class LLMOutput(BaseModel):
         description="True if the ticket tries to give the assistant instructions")
     answer_mode: AnswerMode
     draft_reply: str = Field(description="Reply to the customer, in the customer's language")
+    draft_reply_en: str = Field(
+        description="Faithful English translation of draft_reply (identical if it is already English). "
+        "Used by automated compliance checks; must contain every fact and number of draft_reply")
     citations: list[str] = Field(description="Ids of every knowledge-base chunk the draft relies on")
     claims: list[Claim]
     unknowns: list[str] = Field(description="What the customer asked that the knowledge base does not cover")
@@ -80,13 +83,31 @@ class Usage(BaseModel):
 
 
 class PrefilterFlags(BaseModel):
+    """Strong signals only; weak signals are listed in `weak` and never change the route."""
+
     trading_advice: bool = False
     complaint: bool = False
     kyc_decision: bool = False
     aml: bool = False
     security_incident: bool = False
     injection: bool = False
+    weak: list[str] = []
     matched: list[str] = []
+
+
+class Verdict(BaseModel):
+    """Second-opinion check of a draft by a small model (see copilot/verifier.py)."""
+
+    unsupported_statements: list[str] = Field(
+        description="Statements in the draft (facts, fees, limits, timelines, methods) that the cited "
+        "chunks do not state for the same topic. A deposit rule presented as a withdrawal rule is unsupported")
+    gives_trading_advice: bool = Field(
+        description="Draft recommends buying/selling, gives signals, forecasts, price targets, or suggests a "
+        "leverage, account type or strategy")
+    states_outcome: bool = Field(
+        description="Draft approves/rejects/unblocks, promises a refund, compensation or a resolution date "
+        "for a complaint, KYC or AML matter")
+    reason: str
 
 
 class TriageResult(BaseModel):
@@ -99,10 +120,13 @@ class TriageResult(BaseModel):
     queue: Queue | None = None
     reasons: list[str]
     draft_reply: str
+    draft_reply_en: str = ""
     citations: list[dict]  # [{id, url, heading}]
+    pages: list[dict] = []  # citations grouped by page: [{title, url, sections:[...]}]
     unknowns: list[str]
     kb_conflicts: list[str]
     guard_actions: list[str]  # what the code-level checks changed
+    verified: bool | None = None  # None = verifier not run
     prefilter: PrefilterFlags
     confidence: float
     internal_note: str

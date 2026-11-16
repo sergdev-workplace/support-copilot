@@ -1,28 +1,32 @@
 """LLM backends.
 
-- AnthropicBackend: one structured-output call per ticket, knowledge base in a
-  cached system prompt, server-side refusal fallback enabled.
-- MockBackend: no LLM at all; keyword classification + lexical retrieval that
-  returns the best FAQ chunk verbatim. It lets the whole pipeline and eval run
-  offline, and doubles as the "rules + search only" baseline in the business case.
+- AnthropicBackend: one structured-output call per ticket. Phase 1: whole KB in a cached system
+  prompt. Phase 2 (`retrieval_k`): instructions cached, top-k retrieved chunks in the user turn.
+  Server-side refusal fallback enabled; if the account rejects that beta, the call is retried once
+  without it and the backend remembers (REQ-06).
+- MockBackend: no LLM at all; keyword classification + lexical retrieval that returns the best FAQ
+  chunk verbatim. It lets the whole pipeline and eval run offline, and doubles as the "rules +
+  search only" baseline in the business case.
 """
 from __future__ import annotations
 
 import re
+import sys
 import time
 from dataclasses import dataclass
 
 from . import kb, prompt
 from .schema import Classification, LLMOutput, Usage
 
-# USD per 1M tokens (Claude API list prices, checked 2026-11). Cache reads are
-# billed at ~0.1x input; 1-hour cache writes at 2x input. At ~14 tickets/hour a
-# 5-minute cache would expire between tickets, so the 1-hour TTL is used.
+# USD per 1M tokens (Claude API list prices, checked 2026-11). Cache reads are billed at ~0.1x
+# input; 1-hour cache writes at 2x input. At ~14 tickets/hour a 5-minute cache would expire
+# between tickets, so the 1-hour TTL is used (ISS-06).
 PRICING = {
     "claude-haiku-5-5": {"in": 0.10, "out": 0.50, "cache_read": 0.01, "cache_write": 0.20},
     "claude-sonnet-5-5": {"in": 2.00, "out": 10.00, "cache_read": 0.10, "cache_write": 4.00},
     "claude-opus-5-5": {"in": 4.00, "out": 20.00, "cache_read": 0.20, "cache_write": 8.00},
 }
+VERIFIER_MODEL = "claude-haiku-5-5"
 
 
 @dataclass(frozen=True)
@@ -30,17 +34,26 @@ class Config:
     name: str
     model: str | None  # None = mock
     effort: str = "low"
-    escalate_model: str | None = None  # cascade: re-run uncertain answers on this model
+    escalate_model: str | None = None  # cascade: re-run doubtful drafts on this model
+    verify: bool = False               # second-opinion verifier on every draft
+    retrieval_k: int | None = None     # phase 2: top-k chunks instead of the whole KB
     description: str = ""
 
 
 CONFIGS = {
     "mock": Config("mock", None, description="No LLM: keyword rules + lexical FAQ retrieval (baseline)"),
-    "haiku": Config("haiku", "claude-haiku-5-5", "low", description="Claude Haiku 5.5, effort low"),
-    "sonnet": Config("sonnet", "claude-sonnet-5-5", "low", description="Claude Sonnet 5.5, effort low"),
-    "opus": Config("opus", "claude-opus-5-5", "low", description="Claude Opus 5.5, effort low"),
-    "cascade": Config("cascade", "claude-haiku-5-5", "low", escalate_model="claude-sonnet-5-5",
-                      description="Haiku 5.5 first; Sonnet 5.5 re-drafts low-confidence answers"),
+    "haiku": Config("haiku", "claude-haiku-5-5", verify=True,
+                    description="Claude Haiku 5.5, effort low, + Haiku verifier"),
+    "sonnet": Config("sonnet", "claude-sonnet-5-5", verify=True,
+                     description="Claude Sonnet 5.5, effort low, + Haiku verifier"),
+    "opus": Config("opus", "claude-opus-5-5", verify=True,
+                   description="Claude Opus 5.5, effort low, + Haiku verifier"),
+    "cascade": Config("cascade", "claude-haiku-5-5", escalate_model="claude-sonnet-5-5", verify=True,
+                      description="Haiku 5.5 first; Sonnet 5.5 re-drafts doubtful outputs; + verifier"),
+    "sonnet-noverify": Config("sonnet-noverify", "claude-sonnet-5-5",
+                              description="Claude Sonnet 5.5 without verifier (ablation)"),
+    "sonnet-rag": Config("sonnet-rag", "claude-sonnet-5-5", verify=True, retrieval_k=6,
+                         description="Phase 2: Sonnet 5.5 with BM25 top-6 retrieval + verifier"),
 }
 
 
@@ -57,28 +70,48 @@ class LLMRefusal(Exception):
 
 
 class AnthropicBackend:
-    def __init__(self, model: str, effort: str = "low"):
+    def __init__(self, model: str, effort: str = "low", retrieval_k: int | None = None):
         import anthropic  # imported lazily so the mock runs without the SDK/key
 
+        self.anthropic = anthropic
         self.client = anthropic.Anthropic(max_retries=3)
         self.model = model
         self.effort = effort
+        self.retrieval_k = retrieval_k
+        self.use_fallbacks = True
+
+    def _request(self, ticket_text: str):
+        if self.retrieval_k:
+            from .retrieval import retrieve
+            system = prompt.system_prompt(with_kb=False)
+            user = prompt.user_message(ticket_text, retrieve(ticket_text, self.retrieval_k))
+        else:
+            system = prompt.system_prompt()
+            user = prompt.user_message(ticket_text)
+        kwargs = dict(
+            model=self.model,
+            max_tokens=8000,
+            # Stable prefix (instructions [+ KB]) is cached for 1 hour; the ticket is not.
+            system=[{"type": "text", "text": system, "cache_control": {"type": "ephemeral", "ttl": "1h"}}],
+            messages=[{"role": "user", "content": user}],
+            output_format=LLMOutput,
+            output_config={"effort": self.effort},
+        )
+        if self.use_fallbacks:
+            # On a safety-classifier decline, the API retries on a fallback model.
+            kwargs.update(betas=["server-side-fallback-2026-07-01"], fallbacks="default")
+        return kwargs
 
     def run(self, ticket_text: str) -> tuple[LLMOutput, Usage]:
         t0 = time.perf_counter()
-        resp = self.client.beta.messages.parse(
-            model=self.model,
-            max_tokens=8000,
-            # Large stable prefix (instructions + KB) is cached; the ticket is not.
-            system=[{"type": "text", "text": prompt.system_prompt(),
-                     "cache_control": {"type": "ephemeral", "ttl": "1h"}}],
-            messages=[{"role": "user", "content": prompt.user_message(ticket_text)}],
-            output_format=LLMOutput,
-            output_config={"effort": self.effort},
-            # If a safety classifier declines, the API retries on a fallback model.
-            betas=["server-side-fallback-2026-07-01"],
-            fallbacks="default",
-        )
+        try:
+            resp = self.client.beta.messages.parse(**self._request(ticket_text))
+        except self.anthropic.BadRequestError as e:
+            if not self.use_fallbacks or "fallback" not in str(e).lower():
+                raise
+            print(f"[copilot] server-side fallback rejected ({e}); retrying without it", file=sys.stderr)
+            self.use_fallbacks = False
+            resp = self.client.beta.messages.parse(**self._request(ticket_text))
         latency = time.perf_counter() - t0
         u = resp.usage
         usage = Usage(
@@ -117,12 +150,13 @@ _KEYWORDS = {
 }
 _STOP = set("a an the i my me you your is are was were to of for in on and or do does can how what "
             "when where why it be with this that have has will please hi hello".split())
+# Generic out-of-KB topics. ("minimum withdrawal" was removed: it was copied from eval ticket T13, ISS-16.)
 _OUT_OF_KB = ["fee", "fees", "bonus", "regulat", "licen", "mt5", "mt4", "password", "email address",
-              "affiliate", "ib program", "skrill", "neteller", "wrong network", "close my account",
-              "phí", "minimum withdrawal"]
+              "affiliate", "ib program", "skrill", "neteller", "wrong network", "close my account", "phí"]
 
 
 def _detect_lang(t: str) -> str:
+    """Mock-only heuristic. The evaluator uses an independent detector (ISS-14)."""
     if re.search(r"[Ѐ-ӿ]", t):
         return "ru"
     if re.search(r"[؀-ۿ]", t):
@@ -130,11 +164,11 @@ def _detect_lang(t: str) -> str:
     if re.search(r"[ơưđạảấầẩẫậắằẳẵặẹẻẽếềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ]", t, re.I):
         return "vi"
     words = set(re.findall(r"[a-záéíóúñãõç]+", t.lower()))
-    if words & {"berapa", "apakah", "akun", "saya", "ada", "lama"}:
+    if words & {"berapa", "apakah", "akun", "saya", "ada", "lama", "sebaiknya"}:
         return "id"
     if words & {"minha", "vocês", "foi", "conta", "não", "manualmente"}:
         return "pt"
-    if words & {"cuánto", "quiero", "debo", "una", "retiro", "tarda", "puedo"}:
+    if words & {"cuánto", "cuál", "quiero", "debo", "una", "retiro", "tarda", "puedo", "mínimo"}:
         return "es"
     return "en"
 
@@ -164,7 +198,7 @@ class MockBackend:
 
         mode, draft, cites, unknowns, conf = "abstain", "", [], [], 0.3
         if category == "trading_advice":
-            mode, draft, conf = "decline_trading_advice", "", 0.8
+            mode, conf = "decline_trading_advice", 0.8
         elif category in ("complaint", "aml_compliance"):
             mode, conf = "holding_reply", 0.7
         elif any(w in low for w in _OUT_OF_KB):
@@ -173,7 +207,7 @@ class MockBackend:
             q = _tokens(ticket_text)
             best, best_score = None, 0.0
             for c in kb.load_chunks().values():
-                if c["kind"] != "faq":
+                if c["kind"] != "faq" or c.get("copy_of"):
                     continue
                 score = len(q & _tokens(c["heading"])) * 2 + len(q & _tokens(c["text"])) * 0.5
                 if score > best_score:
@@ -189,6 +223,7 @@ class MockBackend:
             injection_suspected=False,
             answer_mode=mode,
             draft_reply=draft,
+            draft_reply_en=draft,  # mock drafts are English FAQ text
             citations=cites,
             claims=[],
             unknowns=unknowns,
@@ -199,5 +234,5 @@ class MockBackend:
         return out, Usage(model="mock", latency_s=time.perf_counter() - t0, calls=1)
 
 
-def make_backend(model: str | None, effort: str = "low"):
-    return MockBackend() if model is None else AnthropicBackend(model, effort)
+def make_backend(model: str | None, effort: str = "low", retrieval_k: int | None = None):
+    return MockBackend() if model is None else AnthropicBackend(model, effort, retrieval_k)

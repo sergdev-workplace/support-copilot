@@ -1,67 +1,91 @@
 # Support co-pilot for a forex/CFD broker
 
 Classifies incoming support tickets (category, urgency, language, sentiment), drafts a reply grounded
-in the Valetax help pages with citations or abstains, and routes to a human specialist when needed.
-Trading advice, complaint/KYC/AML decisions and invented policy are blocked by **code-level guards**,
-not only by the prompt.
+in the four Valetax help pages with citations, or abstains, and routes to a human specialist when
+needed. Trading advice, complaint/KYC/AML decisions and invented policy are blocked by **code-level
+guards and a verifier**, not only by the prompt.
 
-- **Business case (one page):** [`BUSINESS_CASE.md`](BUSINESS_CASE.md)
-- Design decisions: [`docs/decisions.md`](docs/decisions.md)
-- Knowledge-base gaps and contradictions: [`docs/kb_issues.md`](docs/kb_issues.md)
-- Phase 2 (scale): [`docs/phase2.md`](docs/phase2.md)
+| Read | What |
+|---|---|
+| [`BUSINESS_CASE.md`](BUSINESS_CASE.md) | One page: is it worth running at 10K tickets/month, and with which configuration |
+| [`docs/phase1.md`](docs/phase1.md) | Ship ASAP: what is cut, shadow → pilot → rollout, how agents use it |
+| [`docs/phase2.md`](docs/phase2.md) | Scale: what is implemented (routing config, SOPs, retrieval, cascade, CI) and what is next |
+| [`docs/decisions.md`](docs/decisions.md) | Design decisions to discuss |
+| [`docs/kb_issues.md`](docs/kb_issues.md) | Gaps, copies and contradictions in the knowledge base, and how each is handled |
+| [`docs/issues_log.md`](docs/issues_log.md) | Every problem found in this solution, how it was found, and how it was fixed |
 
 ## How a ticket flows
 
 ```
-ticket ─► prefilter.py   regex flags: trading advice, complaint, KYC decision, AML, security, injection
-       ─► llm.py         one Claude call: KB in a cached system prompt → structured JSON
-                         (classification, answer_mode, draft, citations, claims, unknowns, kb_conflicts)
-       ─► postcheck.py   advice in draft → decline template · citations must exist ·
-                         every number must appear in a cited chunk or the ticket → else abstain ·
-                         KYC/complaint/AML outcome stated → holding reply
-       ─► router.py      agent_review | agent_answer | escalate → compliance / kyc_team / complaints / senior_support
+ticket ─► prefilter.py   strong flags act (advice, complaint, KYC decision, AML, compromise, injection);
+                         weak flags (refund, scam, signal...) only add a "check" note
+       ─► llm.py         one Claude call, KB in a 1-hour cached prompt → structured JSON: classification,
+                         answer_mode, draft (+ English rendering), citations, claims, unknowns, kb_conflicts
+       ─► [cascade]      optional: cheap model first, stronger model re-drafts doubtful outputs
+       ─► postcheck.py   on every mode and both languages: advice → decline · citations exist, customer-facing,
+                         on the asked topic · every fact (numbers, words, durations) grounded in the ticket or a
+                         same-topic cited chunk · no complaint/KYC/AML outcome or date → localized templates
+       ─► verifier.py    Haiku reads draft + cited chunks: unsupported statements, advice, implied outcomes
+       ─► router.py      rules from config/routing.toml → agent_review | agent_answer |
+                         escalate → compliance / kyc_team / complaints / senior_support
 ```
 
 `answer_mode`: `answer` (grounded, cited) · `abstain` (KB doesn't cover it) · `decline_trading_advice` ·
-`holding_reply` (specialist must decide). Every draft is reviewed by an agent before it is sent.
+`holding_reply` (a specialist decides). Every draft is reviewed by an agent before it is sent.
 
 ## Run it
 
 ```bash
 pip install -r requirements.txt
-python kb/build_kb.py            # rebuild chunks from kb/raw snapshots (add --fetch to re-download)
-python -m pytest -q              # guard tests, no API needed
+python kb/build_kb.py              # chunks from kb/raw snapshots (--fetch re-downloads, --with-sops adds SOPs)
+python -m pytest -q                # 49 tests: guards, routing, retrieval, API request shape; no API key
 
 # offline, no API key: rules + lexical-search baseline
 python -m copilot triage --config mock --text "Can you approve my KYC manually?"
-python -m copilot eval --config mock
+python -m copilot eval --config mock --gate
+python -m copilot batch --in eval/sample_queue.csv --out out/queue --config mock
+python -m copilot serve --config mock            # http://127.0.0.1:8000
+python -m copilot retrieval-eval
 
 # with Claude (export ANTHROPIC_API_KEY=...)
-python -m copilot triage --config sonnet --text "¿Cuánto tarda en acreditarse un depósito?"
-python -m copilot eval --config haiku      # also: sonnet, opus, cascade
-python -m copilot compare                  # table of all eval runs
-python -m copilot business-case            # regenerates BUSINESS_CASE.md from eval results
+python -m copilot smoke --config sonnet          # 2 calls: request accepted, output parses, cache read
+python -m copilot eval --config haiku            # also: sonnet, opus, cascade, sonnet-noverify, sonnet-rag
+python -m copilot compare                        # table of all eval runs
+python -m copilot business-case                  # regenerates BUSINESS_CASE.md from eval results
 ```
 
-Configs (`copilot/llm.py`): `mock` (no LLM), `haiku` / `sonnet` / `opus` (Claude Haiku 5.5, Sonnet 5.5,
-Opus 5.5 at effort `low`), `cascade` (Haiku first, Sonnet re-drafts low-confidence answers).
-A full eval run is 58 calls; at list prices it costs well under $1 per config.
+Configs (`copilot/llm.py`): `mock` (no LLM) · `haiku` / `sonnet` / `opus` (Claude 5.5 models at effort
+`low`, each with the Haiku verifier) · `cascade` (Haiku, Sonnet re-drafts doubtful outputs) ·
+`sonnet-noverify` (ablation: what the verifier adds) · `sonnet-rag` (phase 2: BM25 top-6 instead of the
+whole KB). A full eval run is 75 tickets × 2 calls; at list prices well under $1 per config.
 
 ## Repository
 
 ```
-copilot/            pipeline.py prefilter.py llm.py prompt.py postcheck.py router.py schema.py kb.py
-                    evaluate.py business_case.py __main__.py (CLI)
-kb/                 build_kb.py · raw/ (HTML snapshots 2026-11-16) · pages/ (readable) · chunks.jsonl (29 chunks)
-eval/               tickets.jsonl (58 labelled tickets, 7 languages) · results/<config>.json
-tests/              test_guards.py
+copilot/   pipeline.py prefilter.py llm.py prompt.py postcheck.py verifier.py router.py templates.py
+           retrieval.py kb.py schema.py evaluate.py business_case.py web.py __main__.py (CLI)
+config/    routing.toml (escalation rules = SOP as configuration)
+kb/        build_kb.py · raw/ (HTML snapshots, fetched 2026-11-16) · pages/ (readable) · chunks.jsonl (29 chunks,
+           9 marked copy_of) · sops/ (example internal SOP, off by default)
+eval/      tickets.jsonl (75 labelled tickets, 7 languages, incl. benign and adversarial) · results/<config>.json
+           · sample_queue.csv
+tests/     test_guards.py (hard rules, one test per issue) · test_platform.py (routing, retrieval, batch, API path)
+.github/   workflows/ci.yml (tests + safety gate)
 ```
 
-## What is mocked or simplified
-- **UI**: a CLI. The real version posts the result as a private note + tags + suggested macro in the helpdesk.
-- **Eval data**: synthetic tickets written for this task, labelled with sets of acceptable answers.
-  Real version: ~300 labelled production tickets + an LLM judge calibrated on human grades.
-- **Business-case inputs** (AHT, wage, traffic mix, minutes saved) are explicit assumptions in
-  `copilot/business_case.py`, to be replaced with pilot measurements.
-- **Mock backend** is a deliberately simple baseline; its keyword lists were written alongside the eval
-  set, so its scores are optimistic.
+## What is mocked or simplified, and what the real version does
+- **UI**: CLI, batch CSV and a one-page local web UI. Real: helpdesk sidebar app; the result is written as a
+  private note with tags and the suggested queue.
+- **Eval data**: 75 synthetic tickets, labels are sets of acceptable answers. Real: labelled tickets from the
+  shadow week and pilot, plus an LLM judge calibrated on human grades.
+- **Business-case inputs** (AHT, wages, traffic mix, minutes saved) are explicit assumptions in
+  `copilot/business_case.py`, replaced by pilot measurements (`docs/phase1.md`).
+- **Mock backend** is a deliberately simple baseline used for offline runs and CI.
+- **Account data** ("where is my withdrawal #123") is out of scope; the real version adds read-only tools.
+- **Example SOP** in `kb/sops/` is invented to demonstrate the mechanism and is not Valetax policy.
+
+## How it was built
+Built with Claude Code (agentic coding) in one working session plus a review round: plan → KB scrape and
+chunking → pipeline and guards → eval → business case → self-review with targeted probes against the guards
+and a check of every requirement in the task. Each defect found by tests, eval or review is recorded with its
+fix and covering test in [`docs/issues_log.md`](docs/issues_log.md).

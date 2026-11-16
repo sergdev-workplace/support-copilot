@@ -1,5 +1,5 @@
 # How to Open an Account
-Source: https://valetax.com/how-to-open-an-account/
+Source: https://valetax.com/how-to-open-an-account/ (snapshot 2026-11-16)
 
 ## [open_account#steps] How to Open an Account: overview and steps
 Discover a seamless trading experience with us. Open your account with us in 3 quick and simple steps Sign Up

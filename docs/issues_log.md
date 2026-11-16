@@ -1,0 +1,51 @@
+# Issues log
+
+Every problem found in the solution: how it was found, what was wrong, and how it was fixed.
+New entries go at the bottom of the relevant table; an issue moves from "Open" to "Fixed" with the
+fix and the test or eval that now covers it. Severity: **critical** = a hard rule can be broken;
+**high** = measurement or business case is wrong; **medium** = operational quality; **low** = cosmetic.
+
+Rounds: **R1** = first build (2026-11-16); **R2** = self-review with probes + check against the task
+statement (2026-11-17); **R3** = implementing the R2 fixes (2026-11-17).
+
+## Fixed
+
+| ID | Round / found by | Severity | Problem | Fix | Covered by |
+|---|---|---|---|---|---|
+| ISS-01 | R1, eval (mock) T28 | critical | AML pattern ended in `report\b`, so "so it doesn't get **reported**" did not match; a structuring question was not escalated to compliance. | Pattern `report(ed)?` / `avoid(ing)? (the )?report(ing)?` (`prefilter.py`). | `test_iss01_structuring_question_is_flagged_aml`, eval T28 |
+| ISS-02 | R1, unit test | critical | Guard order: an advice-like draft without citations was first turned into `abstain`, so the advice check never saw the original text. | Advice check runs first, on the model's own draft (`postcheck.py`). | `test_iss02_advice_in_draft_is_replaced` |
+| ISS-03 | R1, eval review | high | An English FAQ answer to a Russian/Arabic ticket counted as a usable draft. | `draft_language_ok` is part of "usable" (`evaluate.py`). Its detector was wrong, see ISS-14. | eval |
+| ISS-04 | R1, eval review | high | Mock keywords contained phrases copied from eval tickets ("brother's", "doesn't get reported"), inflating the baseline. | Removed; the last one ("minimum withdrawal", from T13) removed in R3 (ISS-16). | eval (mock now fails T13 honestly and the guards catch it, ISS-23) |
+| ISS-05 | R1, eval (mock) T24, T38, T52 | critical | KYC-decision and account-compromise tickets could end in `abstain` instead of a holding reply. | `holding = true` routing rules include security incidents; post-check turns `answer`/`abstain` into `holding_reply`. | `test_iss05_security_incident_gets_holding_reply`, eval T24, T38, T52 |
+| ISS-06 | R1, cost review | medium | A 5-minute prompt cache expires between tickets at ~14 tickets/hour. | 1-hour cache TTL; prices use the 1-hour write rate (`llm.py`). | `test_request_shape_and_parse` (asserts `ttl: 1h`) |
+| ISS-10 | R2, probe | critical | Number guard checked presence, not meaning: "minimum **withdrawal** is 8 USD" citing the copied `withdraw#what-is-the-minimum-deposit-amount` chunk passed. | (1) KB build marks 9 duplicated chunks `copy_of`; prompt explains it. (2) Fact-level topic check: a fact in a sentence about withdrawals must come from a chunk whose heading/text is about withdrawals. (3) Verifier judges "same topic" support. | `test_iss10_*`, eval T13, A01 |
+| ISS-11 | R2, probe | critical | Post-checks only ran for `answer`/`decline`: "resolved within 5 business days" in a holding reply and "fees are about 1%" in an abstain draft passed. | All checks run on every mode; ungrounded facts in holding/abstain drafts → localized holding/abstain template. Vague time frames ("a few days") count as facts. | `test_iss11_*` (3 tests), eval A03 |
+| ISS-12 | R2, probe | critical | Advice/decision regexes were English-only while drafts are in the customer's language: Spanish advice with a citation passed. | Schema adds `draft_reply_en` (faithful English rendering); every pattern runs on both texts; the Haiku verifier checks advice in any language and phrasing. | `test_iss12_*` (2 tests), eval T45, T49, A05 |
+| ISS-13 | R2, probe | critical | Numbers written as words ("dos dólares", "two days") bypassed the number guard. | Fact extraction parses English number words and durations on the English rendering; the verifier covers the rest. | `test_iss13_numbers_written_as_words_are_checked` |
+| ISS-14 | R2, probe | high | The evaluator used the mock's language heuristic: a normal Spanish draft was detected as `en` and scored unusable, biasing the business case against LLM configs; circular for the mock. | Evaluator uses `lingua` (independent of the system under test). | eval (`draft_language_ok`) |
+| ISS-15 | R2, review | high | Business case ignored specialist time on false escalations; review time implicit; single point estimate. | Added specialist cost of false escalations, made "minutes saved" explicitly net of review, added a pessimistic net at 95% lower bounds, and a "benign" segment. Result: the mock's false escalations cost ~$740/month, more than any LLM. | `BUSINESS_CASE.md` |
+| ISS-16 | R2, review | high | Eval small, synthetic, no benign negatives, no intervals. | +10 benign tickets (trigger words in ordinary questions), +7 adversarial tickets (every R2 bypass); 95% Wilson intervals per segment; fact check re-run on shipped drafts. Still synthetic: real tickets come from the pilot. | eval (75 tickets) |
+| ISS-17 | R2, probe | medium | Pre-filter false positives escalated via OR logic ("no signal" → advice, MT5 "unauthorized" → security, "scam site" → complaint). | Strong vs weak signals; weak signals only add a "check" note. | `test_iss17_*` (2 tests), eval B01-B07 |
+| ISS-18 | R2, probe | medium | False abstains: numbered lists ("1. 2. 3.") and "1 hour" for "60 minutes" failed the number guard. | List markers and "step N" ignored; durations normalised to minutes; customer-language numbers judged via the English rendering. | `test_iss18_*` (3 tests) |
+| ISS-19 | R2, review | medium | Guard templates were English only. | `templates.py`: holding/decline/abstain in en, ru, es, pt, id, ar, vi; other languages fall back to English with a "translate" note. | `test_iss19_*` (2 tests) |
+| ISS-20 | R2, review | medium | Cascade trusted uncalibrated self-reported confidence; a false abstain was never re-run. | Cascade also re-drafts core-topic abstentions and any output the guards would rewrite. | `test_cascade_*` (2 tests) |
+| ISS-21 | R2, review | low | Docs said the cache minimum may be 4096 tokens; for Claude 5.5 models it is 512. | `docs/decisions.md` corrected. | - |
+| ISS-22 | R2, review | low | Ticket text could close the `</ticket>` wrapper; `snapshot_date` was the build date; dead line in `pipeline.py`. | Tags escaped in prompt and verifier; fetch date stored in `kb/raw/FETCHED_AT`; pipeline rewritten. | `test_iss22_ticket_cannot_close_the_wrapper` |
+| ISS-23 | R3, eval (mock) T13 | critical | "What's the minimum withdrawal?" answered with the minimum-**deposit** FAQ: a correct sentence on the wrong topic, so the fact checks passed. | Question/citation topic check (7 languages): a question about exactly one money topic must cite at least one chunk on that topic, else abstain. | `test_iss23_*` (2 tests), eval T13 |
+| ISS-24 | R3, eval (mock) A06 | critical | "Which leverage do most beginners use?" was not flagged and got a factual leverage answer. | Pre-filter patterns for indirect leverage suggestions; code rule: a strong advice request the model answered is replaced by the decline template. | `test_strong_advice_request_answered_by_model_is_declined`, eval A06 |
+| ISS-25 | R3, batch run | low | Reason text said "weak signal ... (not escalated)" on tickets escalated for another reason. | Wording: "does not escalate by itself". | batch output |
+| REQ-03 | R2, task check | high | Phase 1 had no rollout plan; agents could only triage one ticket at a time. | `docs/phase1.md` (cut list, shadow → pilot → rollout with exit criteria, day-1 agent workflow, pilot metrics); `batch` CLI (JSONL/CSV → JSONL + Excel-ready CSV); `serve` web page. | `test_batch_cli_writes_jsonl_and_csv` |
+| REQ-04 | R2, task check | high | SOPs not modelled; routing hard-coded; KB growth not demonstrated. | `config/routing.toml` (declarative rules); `audience` field + internal SOP chunks never cited; BM25 retrieval + `retrieval_k` + retrieval eval (non-English recall 25%: measured reason for multilingual retrieval). | `test_routing_*`, `test_internal_sop_*`, `test_bm25_*`, `test_retrieval_mode_*` |
+| REQ-05 | R2, task check | medium | No CI regression gate. | `.github/workflows/ci.yml`: KB build, tests, `eval --gate` on mock; on sonnet when an API key secret exists. | CI |
+| REQ-06 | R2, task check | medium | Real API path untested; a rejected beta parameter would degrade every ticket. | Retry without `fallbacks` on a 400 that names it; `smoke` command; request shape tested against a fake HTTP server. | `test_request_shape_and_parse`, `test_fallback_beta_rejected_is_retried_without_it` |
+| REQ-07 | R2, task check | medium | Agent saw chunk ids, not pages. | `pages` in the result: page title, URL, sections used; shown in CLI, CSV and web UI. | `test_citations_grouped_by_page` |
+| REQ-08 | R2, task check | low | Not stated how Claude Code was used. | README "How it was built", linking this log. | - |
+
+## Open
+
+| ID | Source | Severity | Problem | Plan |
+|---|---|---|---|---|
+| REQ-01 | R2, task check | critical | "Measure it": only the no-LLM baseline is measured; no API key in the build environment. | `export ANTHROPIC_API_KEY=...`; `smoke --config sonnet`; `eval` for haiku, sonnet, opus, cascade, sonnet-noverify, sonnet-rag (~$3 total). |
+| REQ-02 | R2, task check | critical | Business case cannot name a configuration until REQ-01. | `python -m copilot business-case` after REQ-01; check it still fits one page. |
+| REQ-09 | R2, task check | low | Repo will be private: reviewers need access, not just a link. | Create the private repo at the very end; invite the reviewers' GitHub accounts as collaborators. |
+| ISS-26 | R3, retrieval eval | medium | BM25 recall on non-English tickets is 25% (2/8). Phase 1 is unaffected (whole KB in prompt); phase-2 retrieval is not production-ready for multilingual traffic. | Multilingual embeddings or a Haiku English query rewrite before BM25; re-run `retrieval-eval`. |

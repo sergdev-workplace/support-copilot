@@ -1,36 +1,40 @@
 # Phase 2: scale up
 
-Volume is not the hard part: 10,000 tickets/month is ~14/hour, one API call each, a few seconds
-of latency. One small worker handles it. What breaks with growth is **knowledge** (the KB and SOPs
-grow past one prompt and change weekly) and **quality control** (no one reads every draft any more).
+Volume is not the hard part: 10,000 tickets/month is ~14/hour, two API calls each (draft + verifier),
+a few seconds of latency. One small worker handles it; 10x volume is still one worker with a queue.
+What breaks with growth is **knowledge** (KB and SOPs outgrow one prompt and change weekly),
+**specialist capacity** (false escalations land on the most expensive people) and **quality control**
+(no one reads every draft any more).
 
-## 1. Knowledge: from "whole KB in prompt" to retrieval
+## Implemented in this repo
+
+| What | Where | Status |
+|---|---|---|
+| Routing/escalation policy as configuration (SOP changes without a release) | `config/routing.toml`, `copilot/router.py` | done, tested |
+| Internal SOPs in the KB, `audience = "internal"`, never cited to customers | `kb/build_kb.py --with-sops`, `kb/sops/`, guard in `postcheck.py` | done (example SOP, off by default) |
+| `copy_of` metadata for duplicated content | `kb/build_kb.py` | done |
+| BM25 retrieval behind the `kb` seam; `retrieval_k` config moves chunks from the cached system prompt into the user turn | `copilot/retrieval.py`, config `sonnet-rag` | done |
+| Retrieval eval, per language | `python -m copilot retrieval-eval` | done, see result below |
+| Cascade: Haiku drafts, Sonnet re-drafts doubtful outputs (low confidence, core-topic abstain, or guards would fire) | config `cascade` | done |
+| Eval as a CI regression gate | `.github/workflows/ci.yml`, `eval --gate` | done (mock in CI; LLM configs when an API key secret exists) |
+| Batch processing of a ticket queue | `python -m copilot batch` | done |
+
+### Retrieval result (BM25, k=6, page-level recall)
+English tickets: **100%** (20/20). Non-English tickets: **25%** (2/8). Lexical retrieval over an
+English KB does not work for Russian, Arabic, Vietnamese or Indonesian tickets, and those are a
+large part of a retail broker's traffic. That is why phase 1 keeps the whole KB in the prompt (the
+model reads every language), and why phase 2 retrieval needs either multilingual embeddings or a
+cheap English query rewrite (one Haiku call) before BM25. This is a measured reason, not a guess.
+
+## Still to do in phase 2
+
 | Step | What | Why |
 |---|---|---|
-| Ingestion pipeline | Scheduled crawl/export of help-centre pages and internal SOPs → chunks with `id`, `source`, `version`, `effective_date`, `audience` (customer vs internal). Change detection by content hash. | Citations stay stable; we know which version an answer was based on. |
-| Hybrid retrieval | BM25 + embeddings, top-k ~8, re-rank, filter by audience (never cite an internal SOP to a customer). The `kb` module is the seam: `render_for_prompt()` becomes `retrieve(ticket)`. | KB no longer fits one prompt; lexical search matters for exact terms (USDT, TRC20, "1:2000"). |
-| Retrieval eval | recall@k on labelled ticket→chunk pairs, run in CI with the main eval. | Most RAG failures are retrieval failures, not generation failures. |
-| Conflict register | `kb_issues.md` becomes a tracked list owned by the support lead; chunks can be marked `deprecated`. | Contradictions get fixed at the source instead of being handled by the prompt. |
-
-## 2. Quality at scale
-- **Eval as a regression gate in CI**: any change to the prompt, the model or the KB re-runs the eval; the build fails on any hard-rule violation or escalation miss.
-- **Online metrics** from the helpdesk: draft acceptance rate, edit distance between draft and sent reply, abstain rate, escalation rate per queue, re-open rate. Alert on drift.
-- **Feedback loop**: heavily edited drafts and wrong routes go into the eval set every week.
-- **LLM judge** for groundedness and tone, calibrated against human grades, on a daily sample.
-
-## 3. Cost at scale
-- `cascade` config: Haiku 5.5 for every ticket, Sonnet 5.5 re-drafts only low-confidence answers (already implemented; measured in the eval).
-- Batch API (-50%) for queues with no first-response SLA (e.g. overnight email backlog).
-- Prompt caching with a stable prefix: with retrieval, cache the instructions; retrieved chunks go after the cache breakpoint.
-
-## 4. Production plumbing
-- Helpdesk integration (Zendesk/Freshdesk webhook → queue → worker → private note + tags + suggested macro on the ticket). The agent stays the sender.
-- PII: mask card numbers, IBANs, document numbers before the LLM call; data-retention settings agreed with compliance.
-- Audit log per ticket: prompt version, KB version, model, raw output, guard actions, final route. Needed for compliance reviews of any "advice" complaint.
-- Rate limits and retries are in the SDK; on outage the router already degrades to `agent_answer`.
-- Language coverage: extend pre-filter patterns from production tickets in the top languages.
-
-## Implemented in this repo for phase 2
-- `cascade` config (`copilot/llm.py`, `copilot/pipeline.py`).
-- The `kb` module as the single seam for swapping in retrieval.
-- Eval and business case that re-run from one command, so they can run in CI.
+| Multilingual retrieval | Embeddings (multilingual model) + BM25 hybrid, or Haiku query rewrite to English | Non-English recall 25% with BM25 alone |
+| Ingestion pipeline | Scheduled crawl/export of help pages and SOPs, content-hash change detection, `version`, `effective_date` | Citations stay stable; we know which KB version an answer used |
+| Account data tools | Read-only lookup of the customer's deposits/withdrawals/KYC status (tool use) | "Where is my withdrawal #123" is most money traffic; the public KB can't answer it |
+| Online metrics | Acceptance rate, edit distance, abstain/escalation rate per queue, specialist bounce-backs; alerts on drift | Nobody reads every draft at scale |
+| Feedback loop | Edited drafts and wrong routes flow into `eval/tickets.jsonl` weekly | The eval grows from real traffic |
+| Batch API | 50% cheaper for queues without a first-response SLA (overnight email) | Cost at higher volume |
+| Helpdesk integration | Webhook → queue → worker → private note + tags + suggested macro | Agents stop copy-pasting |
+| PII and audit | Mask card numbers/IBANs/document numbers before the LLM; per-ticket audit log (prompt version, KB version, model, raw output, guard actions) | Compliance review of any "advice" complaint |

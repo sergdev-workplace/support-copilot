@@ -1,0 +1,47 @@
+# Routing rules (SOP as configuration). Support leads change escalation policy here, without a
+# code release; `python -m copilot eval` must still pass afterwards (CI gate).
+#
+# A rule fires when ANY of its `when` conditions matches. Inside one condition all fields must
+# match (AND). Fields: category, urgency, sentiment (lists), flag (strong pre-filter flag),
+# decision_requested (bool). `holding = true` means a person must decide the outcome: the draft
+# is forced to a holding reply (hard rule 2).
+
+queue_priority = ["compliance", "kyc_team", "complaints", "senior_support"]
+confidence_floor = 0.6        # answers below this go to agent_answer
+cascade_confidence = 0.75     # cascade config re-drafts answers below this with the stronger model
+
+[[rule]]
+queue = "compliance"
+holding = true
+reason = "AML/compliance topic: outcome must be decided by compliance"
+when = [{ category = ["aml_compliance"] }, { flag = "aml" }]
+
+[[rule]]
+queue = "kyc_team"
+holding = true
+reason = "KYC outcome requested: only the KYC team decides"
+when = [{ flag = "kyc_decision" }, { category = ["verification"], decision_requested = true }]
+
+[[rule]]
+queue = "complaints"
+holding = true
+reason = "complaint: handled under the complaints procedure"
+when = [{ category = ["complaint"] }, { flag = "complaint" }]
+
+[[rule]]
+queue = "senior_support"
+holding = true
+reason = "possible account compromise"
+when = [{ flag = "security_incident" }]
+
+[[rule]]
+queue = "senior_support"
+holding = false
+reason = "critical urgency"
+when = [{ urgency = ["critical"] }]
+
+[[rule]]
+queue = "senior_support"
+holding = false
+reason = "upset customer with a high-urgency money issue"
+when = [{ category = ["deposit", "withdrawal"], urgency = ["high", "critical"], sentiment = ["negative", "angry"] }]

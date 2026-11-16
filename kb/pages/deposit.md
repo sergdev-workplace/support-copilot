@@ -1,5 +1,5 @@
 # How to Deposit
-Source: https://valetax.com/how-to-deposit/
+Source: https://valetax.com/how-to-deposit/ (snapshot 2026-11-16)
 
 ## [deposit#steps] How to Deposit: overview and steps
 Valetax offers a range of instant, simple and secure funding methods catering to your requirements and preferences Fund Account
