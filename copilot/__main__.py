@@ -34,6 +34,8 @@ def format_result(r) -> str:
     L += [f"  guard:  {x}" for x in r.guard_actions]
     if r.prefilter.matched:
         L.append(f"  prefilter: {r.prefilter.matched}")
+    if r.pii_masked:
+        L.append(f"  personal data masked before the LLM: {r.pii_masked}")
     L += ["", "--- draft ---", r.draft_reply]
     if r.draft_reply_en and r.draft_reply_en != r.draft_reply:
         L += ["", "--- draft (English, for checks) ---", r.draft_reply_en]

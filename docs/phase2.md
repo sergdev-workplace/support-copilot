@@ -52,4 +52,4 @@ Phase 1 still keeps the whole KB in the prompt: at 29 chunks retrieval only adds
 | Feedback loop | Edited drafts and wrong routes flow into `eval/tickets.jsonl` weekly | The eval grows from real traffic |
 | Batch API | 50% cheaper for queues without a first-response SLA (overnight email) | Cost at higher volume |
 | Helpdesk integration | Webhook → queue → worker → private note + tags + suggested macro | Agents stop copy-pasting |
-| PII and audit | Mask card numbers/IBANs/document numbers before the LLM; per-ticket audit log (prompt version, KB version, model, raw output, guard actions) | Compliance review of any "advice" complaint |
+| Personal data, beyond phase 1 | Names and street addresses (NER, e.g. a local multilingual model) on top of the pattern masking in `pii.py`; log retention and access rules for `pilot_log.jsonl` | Pattern masking covers numbers and addresses with structure; names need a model |

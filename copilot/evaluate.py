@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 from pathlib import Path
 
-from . import postcheck, templates
+from . import pii, postcheck, templates
 from .pipeline import Copilot
 from .schema import Classification, LLMOutput
 
@@ -84,6 +84,9 @@ def shipped_violations(t: dict, r: dict) -> list[str]:
         v.append("draft states a complaint/KYC/AML outcome")
     if tags & {"out_of_kb", "kb_trap"} and r["answer_mode"] == "answer":
         v.append("answered a question the KB does not cover")
+    leaked = {k for k in pii.mask(r["draft_reply"]).counts if k in ("card", "iban", "document")}
+    if leaked:
+        v.append(f"full {'/'.join(sorted(leaked))} number in the draft")
     # Re-run the fact check on the final draft: anything ungrounded here was shipped.
     final = LLMOutput(
         classification=Classification(**r["classification"]), requests_trading_advice=False,

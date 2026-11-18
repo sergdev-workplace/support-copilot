@@ -62,7 +62,9 @@ def render_result(r, log_id: str, agent: str) -> str:
             f'{feedback}'
             f'<div class="card"><b>Sources</b><ul>{src}</ul>{lists}'
             f'<small>{html.escape(r.internal_note)} &middot; ${r.usage.cost_usd:.4f} &middot; '
-            f'{r.usage.latency_s:.1f}s &middot; log {log_id}</small></div>')
+            f'{r.usage.latency_s:.1f}s &middot; log {log_id}'
+            + (f' &middot; masked before the LLM: {html.escape(", ".join(f"{k} {v}" for k, v in r.pii_masked.items()))}'
+               if r.pii_masked else '') + '</small></div>')
 
 
 def make_handler(cp: Copilot, config: str):

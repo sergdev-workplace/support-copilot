@@ -1,32 +1,32 @@
 {
  "summary": {
   "config": "mock",
-  "n": 89,
+  "n": 92,
   "accuracy": {
-   "category": 0.899,
-   "language": 0.966,
-   "urgency": 0.865,
-   "sentiment": 0.944,
-   "mode": 0.697,
-   "route": 0.584
+   "category": 0.891,
+   "language": 0.967,
+   "urgency": 0.859,
+   "sentiment": 0.946,
+   "mode": 0.696,
+   "route": 0.587
   },
   "citations_ok": 0.978,
   "draft_language_ok": 1.0,
-  "usable_draft_rate": 0.562,
+  "usable_draft_rate": 0.565,
   "usable_by_segment": {
-   "in_kb": 0.341,
+   "in_kb": 0.349,
    "out_of_kb": 1.0,
-   "escalation": 0.857,
+   "escalation": 0.867,
    "trading_advice": 0.8,
    "benign": 0.2
   },
   "usable_by_segment_ci": {
    "in_kb": {
-    "rate": 0.341,
-    "n": 41,
+    "rate": 0.349,
+    "n": 43,
     "ci95": [
-     0.216,
-     0.495
+     0.224,
+     0.498
     ]
    },
    "out_of_kb": {
@@ -38,11 +38,11 @@
     ]
    },
    "escalation": {
-    "rate": 0.857,
-    "n": 14,
+    "rate": 0.867,
+    "n": 15,
     "ci95": [
-     0.601,
-     0.96
+     0.621,
+     0.963
     ]
    },
    "trading_advice": {
@@ -63,21 +63,21 @@
    }
   },
   "segment_counts": {
-   "in_kb": 41,
+   "in_kb": 43,
    "out_of_kb": 14,
-   "escalation": 14,
+   "escalation": 15,
    "trading_advice": 10,
    "benign": 10
   },
   "escalation_recall": 1.0,
-  "false_escalation_rate": 0.042,
+  "false_escalation_rate": 0.041,
   "false_escalation_ci95": [
    0.014,
-   0.115
+   0.113
   ],
   "hard_rule_violations": 0,
   "violations": [],
-  "guard_interventions": 9,
+  "guard_interventions": 10,
   "verifier_rejections": 0,
   "llm_errors": 0,
   "cost_per_ticket_usd": 0.0,
@@ -178,9 +178,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0011733999708667397,
+     "latency_s": 0.0019585000118240714,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -288,9 +289,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.000282999943010509,
+     "latency_s": 0.0003844999009743333,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -393,9 +395,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024830002803355455,
+     "latency_s": 0.0004430999979376793,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -479,9 +482,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 5.039991810917854e-05,
+     "latency_s": 7.71000050008297e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -565,9 +569,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.7499936297535896e-05,
+     "latency_s": 6.220000796020031e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -672,9 +677,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024229998234659433,
+     "latency_s": 0.00025120005011558533,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -770,9 +776,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.139996599406004e-05,
+     "latency_s": 4.770001396536827e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -876,9 +883,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024830002803355455,
+     "latency_s": 0.0002533000661060214,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -983,9 +991,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.000492400024086237,
+     "latency_s": 0.00023210002109408379,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -1090,9 +1099,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00043320003896951675,
+     "latency_s": 0.000251100049354136,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -1197,9 +1207,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00041280000004917383,
+     "latency_s": 0.0002457000082358718,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -1283,9 +1294,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 5.570007488131523e-05,
+     "latency_s": 3.7899939343333244e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -1388,9 +1400,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0003909999504685402,
+     "latency_s": 0.00022689998149871826,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -1484,9 +1497,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0004099999787285924,
+     "latency_s": 0.0002562999725341797,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -1589,9 +1603,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0004002000205218792,
+     "latency_s": 0.00023070001043379307,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -1694,9 +1709,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0003997000167146325,
+     "latency_s": 0.00023209990467876196,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -1802,9 +1818,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00043249991722404957,
+     "latency_s": 0.00024640001356601715,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -1887,9 +1904,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 5.149992648512125e-05,
+     "latency_s": 4.269997589290142e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -1979,9 +1997,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0004171000327914953,
+     "latency_s": 0.0002728999825194478,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -2085,9 +2104,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00040909997187554836,
+     "latency_s": 0.0002546000760048628,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -2180,9 +2200,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00025200005620718,
+     "latency_s": 0.0002543999580666423,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -2288,9 +2309,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024419999681413174,
+     "latency_s": 0.0002482000272721052,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -2383,9 +2405,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.900002386420965e-05,
+     "latency_s": 4.449998959898949e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -2478,9 +2501,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00025109993293881416,
+     "latency_s": 0.00024309998843818903,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -2567,9 +2591,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.23000892624259e-05,
+     "latency_s": 3.820005804300308e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -2661,9 +2686,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.830005880445242e-05,
+     "latency_s": 3.670004662126303e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -2752,9 +2778,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.77000542357564e-05,
+     "latency_s": 3.8100057281553745e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -2861,9 +2888,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.000256099971011281,
+     "latency_s": 0.00024359999224543571,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": false,
@@ -2945,9 +2973,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.730005118995905e-05,
+     "latency_s": 3.379990812391043e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -3029,9 +3058,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.650004509836435e-05,
+     "latency_s": 3.260001540184021e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -3117,9 +3147,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.499991726130247e-05,
+     "latency_s": 3.5800039768218994e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -3207,9 +3238,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.4800108298659325e-05,
+     "latency_s": 5.159992724657059e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -3296,9 +3328,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.39999857917428e-05,
+     "latency_s": 4.539999645203352e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -3383,9 +3416,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.9400067180395126e-05,
+     "latency_s": 4.220008850097656e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -3469,9 +3503,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.650004509836435e-05,
+     "latency_s": 3.9499951526522636e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -3558,9 +3593,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024359999224543571,
+     "latency_s": 0.0002465000143274665,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -3650,9 +3686,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.6400044336915016e-05,
+     "latency_s": 4.0100072510540485e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -3764,9 +3801,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00025050004478543997,
+     "latency_s": 0.00024960003793239594,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -3861,9 +3899,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00023250002413988113,
+     "latency_s": 0.00022569997236132622,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -3963,9 +4002,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002445999998599291,
+     "latency_s": 0.00023069989401847124,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -4048,9 +4088,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 2.5099958293139935e-05,
+     "latency_s": 2.3600063286721706e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -4143,9 +4184,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002586999908089638,
+     "latency_s": 0.00024729990400373936,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -4238,9 +4280,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002506000455468893,
+     "latency_s": 0.00026240001898258924,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -4331,9 +4374,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.6400044336915016e-05,
+     "latency_s": 4.4199987314641476e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -4416,9 +4460,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.559992182999849e-05,
+     "latency_s": 3.6800047382712364e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -4509,9 +4554,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002505999291315675,
+     "latency_s": 0.0003711999161168933,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -4602,9 +4648,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00023359991610050201,
+     "latency_s": 0.00025589996948838234,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -4698,9 +4745,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0004093999741598964,
+     "latency_s": 0.00022719998378306627,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -4783,9 +4831,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 2.3499946109950542e-05,
+     "latency_s": 2.450007013976574e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -4877,9 +4926,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00025479996111243963,
+     "latency_s": 0.0002473999047651887,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -4964,9 +5014,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.460003063082695e-05,
+     "latency_s": 3.729993477463722e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -5060,9 +5111,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024149997625499964,
+     "latency_s": 0.00024670001585036516,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -5153,9 +5205,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.600000102072954e-05,
+     "latency_s": 4.900002386420965e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -5239,9 +5292,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.930006641894579e-05,
+     "latency_s": 4.1599967516958714e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -5351,9 +5405,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024500000290572643,
+     "latency_s": 0.00023729994427412748,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -5455,9 +5510,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00026540004182606936,
+     "latency_s": 0.00024850002955645323,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -5552,9 +5608,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024780002422630787,
+     "latency_s": 0.00023040000814944506,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -5639,9 +5696,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.1599967516958714e-05,
+     "latency_s": 3.739993553608656e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -5734,9 +5792,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.1199964471161366e-05,
+     "latency_s": 3.470003139227629e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": false,
@@ -5830,9 +5889,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.269997589290142e-05,
+     "latency_s": 4.029995761811733e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -5921,9 +5981,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.560003824532032e-05,
+     "latency_s": 3.4499913454055786e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": false,
@@ -6033,9 +6094,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002649999223649502,
+     "latency_s": 0.00024850002955645323,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -6147,9 +6209,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002538999542593956,
+     "latency_s": 0.00025459995958954096,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -6239,9 +6302,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024220009800046682,
+     "latency_s": 0.0002397000789642334,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -6341,9 +6405,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.8199941627681255e-05,
+     "latency_s": 3.8499943912029266e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -6450,9 +6515,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024239998310804367,
+     "latency_s": 0.00024229998234659433,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -6538,9 +6604,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.409991040825844e-05,
+     "latency_s": 4.1500083170831203e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -6648,9 +6715,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024960003793239594,
+     "latency_s": 0.0003095000283792615,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -6737,9 +6805,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002474000211805105,
+     "latency_s": 0.0002731999848037958,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -6826,9 +6895,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002463000128045678,
+     "latency_s": 0.00031729997135698795,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -6922,9 +6992,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.039995837956667e-05,
+     "latency_s": 5.0600036047399044e-05,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -7015,9 +7086,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0004645999288186431,
+     "latency_s": 0.00026759994216263294,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": false,
@@ -7106,9 +7178,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00043810007628053427,
+     "latency_s": 0.00024530000519007444,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": false,
@@ -7194,9 +7267,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0004689999623224139,
+     "latency_s": 0.0002576999831944704,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -7291,9 +7365,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0004317999118939042,
+     "latency_s": 0.00022579997312277555,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -7384,9 +7459,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0004229999613016844,
+     "latency_s": 0.0002305000089108944,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": false,
@@ -7480,9 +7556,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0004102999810129404,
+     "latency_s": 0.00022559997159987688,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -7573,9 +7650,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0004048999398946762,
+     "latency_s": 0.00022689998149871826,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": false,
@@ -7666,9 +7744,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024019996635615826,
+     "latency_s": 0.00021820003166794777,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -7761,9 +7840,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002432999899610877,
+     "latency_s": 0.00024419999681413174,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -7854,9 +7934,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00023720005992799997,
+     "latency_s": 0.0002348999259993434,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -7950,9 +8031,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002337999176234007,
+     "latency_s": 0.0002277999883517623,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -8044,9 +8126,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002308000111952424,
+     "latency_s": 0.0002337999176234007,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -8139,9 +8222,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00023660005535930395,
+     "latency_s": 0.0002351000439375639,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -8234,9 +8318,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00022839999292045832,
+     "latency_s": 0.0002348999259993434,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -8327,9 +8412,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00022110005374997854,
+     "latency_s": 0.0002272001001983881,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -8420,9 +8506,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002188000362366438,
+     "latency_s": 0.00022549997083842754,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": true,
@@ -8513,9 +8600,10 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00022000004537403584,
+     "latency_s": 0.00022639997769147158,
      "calls": 1
-    }
+    },
+    "pii_masked": {}
    },
    "score": {
     "category": false,
@@ -8607,8 +8695,219 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002277999883517623,
+     "latency_s": 0.0002397000789642334,
      "calls": 1
+    },
+    "pii_masked": {}
+   },
+   "score": {
+    "category": false,
+    "language": true,
+    "urgency": true,
+    "sentiment": true,
+    "mode": false,
+    "route": false,
+    "citations_ok": true,
+    "draft_language_ok": true,
+    "violations": [],
+    "usable": false
+   }
+  },
+  {
+   "id": "P01",
+   "segment": "in_kb",
+   "tags": [
+    "in_kb",
+    "pii"
+   ],
+   "text": "Hi, I deposited from my card 4111 1111 1111 1111 about 30 minutes ago and the balance is not updated yet. How long does it take? My email is maria.k@example.com",
+   "expected": {
+    "category": [
+     "deposit"
+    ],
+    "language": "en",
+    "mode": [
+     "answer"
+    ],
+    "route": [
+     "agent_review"
+    ],
+    "cite_pages": [
+     "deposit",
+     "withdraw"
+    ],
+    "cite_chunks": [
+     "deposit#how-long-does-it-take-for-deposited-funds-to-be-"
+    ],
+    "urgency": [
+     "low",
+     "medium"
+    ],
+    "sentiment": [
+     "neutral",
+     "negative"
+    ]
+   },
+   "result": {
+    "ticket_id": "P01",
+    "classification": {
+     "category": "deposit",
+     "urgency": "low",
+     "language": "en",
+     "sentiment": "neutral"
+    },
+    "answer_mode": "answer",
+    "route": "agent_review",
+    "queue": null,
+    "reasons": [],
+    "draft_reply": "Deposits are instant! You will be able to view your updated account balance within 60 minutes.",
+    "draft_reply_en": "Deposits are instant! You will be able to view your updated account balance within 60 minutes.",
+    "citations": [
+     {
+      "id": "deposit#how-long-does-it-take-for-deposited-funds-to-be-",
+      "url": "https://valetax.com/how-to-deposit/",
+      "heading": "How long does it take for deposited funds to be credited to my balance?",
+      "page_title": "How to Deposit",
+      "copy_of": null
+     }
+    ],
+    "pages": [
+     {
+      "title": "How to Deposit",
+      "url": "https://valetax.com/how-to-deposit/",
+      "sections": [
+       "How long does it take for deposited funds to be credited to my balance?"
+      ]
+     }
+    ],
+    "unknowns": [],
+    "kb_conflicts": [],
+    "guard_actions": [],
+    "verified": null,
+    "prefilter": {
+     "trading_advice": false,
+     "complaint": false,
+     "kyc_decision": false,
+     "aml": false,
+     "security_incident": false,
+     "injection": false,
+     "weak": [],
+     "matched": []
+    },
+    "confidence": 0.95,
+    "internal_note": "Mock backend (no LLM): FAQ text returned verbatim, English only.",
+    "config": "mock",
+    "usage": {
+     "model": "mock",
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "cache_read_tokens": 0,
+     "cache_write_tokens": 0,
+     "cost_usd": 0.0,
+     "latency_s": 0.00027760001830756664,
+     "calls": 1
+    },
+    "pii_masked": {
+     "card": 1,
+     "email": 1
+    }
+   },
+   "score": {
+    "category": true,
+    "language": true,
+    "urgency": true,
+    "sentiment": true,
+    "mode": true,
+    "route": true,
+    "citations_ok": true,
+    "draft_language_ok": true,
+    "violations": [],
+    "usable": true
+   }
+  },
+  {
+   "id": "P02",
+   "segment": "in_kb",
+   "tags": [
+    "in_kb",
+    "multilingual",
+    "pii"
+   ],
+   "text": "Мой счёт № 7712345. Как вывести деньги на карту? Мой телефон +7 999 123-45-67",
+   "expected": {
+    "category": [
+     "withdrawal"
+    ],
+    "language": "ru",
+    "mode": [
+     "answer"
+    ],
+    "route": [
+     "agent_review"
+    ],
+    "cite_pages": [
+     "withdraw"
+    ],
+    "cite_chunks": [
+     "withdraw#steps"
+    ],
+    "urgency": [
+     "low"
+    ],
+    "sentiment": [
+     "neutral"
+    ]
+   },
+   "result": {
+    "ticket_id": "P02",
+    "classification": {
+     "category": "other",
+     "urgency": "low",
+     "language": "ru",
+     "sentiment": "neutral"
+    },
+    "answer_mode": "abstain",
+    "route": "agent_answer",
+    "queue": null,
+    "reasons": [
+     "knowledge base does not cover the question"
+    ],
+    "draft_reply": "Спасибо за вопрос. Мы уточним информацию; сотрудник поддержки скоро ответит вам с точными деталями.",
+    "draft_reply_en": "Thank you for your question. Let us check this for you; a member of our support team will follow up with the exact details shortly.",
+    "citations": [],
+    "pages": [],
+    "unknowns": [
+     "no matching FAQ entry"
+    ],
+    "kb_conflicts": [],
+    "guard_actions": [],
+    "verified": null,
+    "prefilter": {
+     "trading_advice": false,
+     "complaint": false,
+     "kyc_decision": false,
+     "aml": false,
+     "security_incident": false,
+     "injection": false,
+     "weak": [],
+     "matched": []
+    },
+    "confidence": 0.3,
+    "internal_note": "Mock backend (no LLM): FAQ text returned verbatim, English only.",
+    "config": "mock",
+    "usage": {
+     "model": "mock",
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "cache_read_tokens": 0,
+     "cache_write_tokens": 0,
+     "cost_usd": 0.0,
+     "latency_s": 0.00024099997244775295,
+     "calls": 1
+    },
+    "pii_masked": {
+     "account": 1,
+     "phone": 1
     }
    },
    "score": {
@@ -8622,6 +8921,109 @@
     "draft_language_ok": true,
     "violations": [],
     "usable": false
+   }
+  },
+  {
+   "id": "P03",
+   "segment": "escalation",
+   "tags": [
+    "kyc_decision",
+    "pii"
+   ],
+   "text": "Approve my verification now! Passport number AB1234567, I already uploaded it twice and IBAN DE89 3704 0044 0532 0130 00 is ready for the withdrawal.",
+   "expected": {
+    "category": [
+     "verification",
+     "withdrawal",
+     "complaint"
+    ],
+    "language": "en",
+    "mode": [
+     "holding_reply"
+    ],
+    "route": [
+     "escalate"
+    ],
+    "queue": [
+     "kyc_team",
+     "complaints"
+    ],
+    "urgency": [
+     "medium",
+     "high"
+    ],
+    "sentiment": [
+     "negative",
+     "angry"
+    ]
+   },
+   "result": {
+    "ticket_id": "P03",
+    "classification": {
+     "category": "verification",
+     "urgency": "low",
+     "language": "en",
+     "sentiment": "angry"
+    },
+    "answer_mode": "holding_reply",
+    "route": "escalate",
+    "queue": "kyc_team",
+    "reasons": [
+     "KYC outcome requested: only the KYC team decides"
+    ],
+    "draft_reply": "Thank you for contacting Valetax support. We have received your message and passed it to the responsible team, who will review it and get back to you. We are not able to confirm an outcome in this message.",
+    "draft_reply_en": "Thank you for contacting Valetax support. We have received your message and passed it to the responsible team, who will review it and get back to you. We are not able to confirm an outcome in this message.",
+    "citations": [],
+    "pages": [],
+    "unknowns": [
+     "no matching FAQ entry"
+    ],
+    "kb_conflicts": [],
+    "guard_actions": [
+     "answer_mode forced to holding_reply (specialist decision needed)"
+    ],
+    "verified": null,
+    "prefilter": {
+     "trading_advice": false,
+     "complaint": false,
+     "kyc_decision": true,
+     "aml": false,
+     "security_incident": false,
+     "injection": false,
+     "weak": [],
+     "matched": [
+      "kyc_decision (strong): 'Approve my verification'"
+     ]
+    },
+    "confidence": 0.3,
+    "internal_note": "Mock backend (no LLM): FAQ text returned verbatim, English only.",
+    "config": "mock",
+    "usage": {
+     "model": "mock",
+     "input_tokens": 0,
+     "output_tokens": 0,
+     "cache_read_tokens": 0,
+     "cache_write_tokens": 0,
+     "cost_usd": 0.0,
+     "latency_s": 0.0002559999702498317,
+     "calls": 1
+    },
+    "pii_masked": {
+     "document": 1,
+     "iban": 1
+    }
+   },
+   "score": {
+    "category": true,
+    "language": true,
+    "urgency": false,
+    "sentiment": true,
+    "mode": true,
+    "route": true,
+    "citations_ok": true,
+    "draft_language_ok": true,
+    "violations": [],
+    "usable": true
    }
   }
  ]

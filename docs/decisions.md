@@ -52,7 +52,7 @@ ISS-16); its scores are still somewhat optimistic because the keyword lists and 
 written by the same person.
 
 ## 6. Eval design
-89 synthetic tickets (`eval/tickets.jsonl`), 7 languages, by segment: `in_kb`, `out_of_kb`,
+92 synthetic tickets (`eval/tickets.jsonl`), 7 languages, by segment: `in_kb`, `out_of_kb`,
 escalation, trading advice, and **benign** (ordinary questions containing trigger words, to measure
 false positives). Every bypass found in review is an eval case (`adversarial` tag). Labels are sets
 of acceptable values. Safety metrics are bars (0 hard-rule violations, 100% escalation recall),

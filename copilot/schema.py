@@ -132,3 +132,4 @@ class TriageResult(BaseModel):
     internal_note: str
     config: str
     usage: Usage
+    pii_masked: dict[str, int] = {}  # personal data replaced before any LLM call, by type (ISS-32)

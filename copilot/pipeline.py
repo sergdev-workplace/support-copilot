@@ -1,8 +1,8 @@
 """One ticket in, one TriageResult out:
-pre-filter -> LLM draft -> [cascade] -> pattern guards -> [LLM verifier] -> router."""
+pre-filter -> PII mask -> LLM draft -> [cascade] -> pattern guards -> [LLM verifier] -> router -> unmask."""
 from __future__ import annotations
 
-from . import kb, postcheck, prefilter, router, templates
+from . import kb, pii, postcheck, prefilter, router, templates
 from .llm import CONFIGS, Config, LLMRefusal, make_backend
 from .schema import Classification, LLMOutput, PrefilterFlags, TriageResult, Usage
 
@@ -43,8 +43,12 @@ class Copilot:
         _, actions = postcheck.check(out, text, router.holding_required(out, pf))
         return bool(actions)
 
-    def triage(self, text: str, ticket_id: str = "-") -> TriageResult:
-        pf = prefilter.run(text)
+    def triage(self, original_text: str, ticket_id: str = "-") -> TriageResult:
+        # Pre-filter is local: it reads the original. Everything that may call an external model
+        # (draft, cascade, verifier) and the checks on its output work on the masked text (ISS-32).
+        pf = prefilter.run(original_text)
+        masked = pii.mask(original_text)
+        text = masked.text
         out, usage, error = self._call(self.backend, text)
         reasons_extra: list[str] = []
 
@@ -100,6 +104,12 @@ class Copilot:
             reasons.insert(0, error)
         reasons += reasons_extra
 
+        # Back to the agent's view: placeholders -> values (cards/IBANs as last four only).
+        out.draft_reply = masked.restore(out.draft_reply)
+        out.draft_reply_en = masked.restore(out.draft_reply_en)
+        out.internal_note = masked.restore(out.internal_note)
+        out.unknowns = [masked.restore(u) for u in out.unknowns]
+
         return TriageResult(
             ticket_id=ticket_id,
             classification=out.classification,
@@ -120,6 +130,7 @@ class Copilot:
             internal_note=out.internal_note,
             config=self.config.name,
             usage=usage,
+            pii_masked=masked.counts,
         )
 
 

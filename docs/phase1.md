@@ -12,7 +12,7 @@ The co-pilot never sends anything; an agent reviews every draft.
 | Routing rules in `config/routing.toml` | Helpdesk-native routing: agents move tickets by hand from the suggested queue |
 | CLI (`triage`, `batch`) and a one-page web UI (`serve`) | Helpdesk sidebar app / webhook: agents copy-paste the draft for two weeks |
 | Localized templates for 7 languages | Other languages: English template + "translate" note to the agent |
-| Eval (89 tickets) as the release gate | 300 labelled real tickets: collected *during* the pilot |
+| Eval (92 tickets) as the release gate | 300 labelled real tickets: collected *during* the pilot |
 
 ## Rollout
 

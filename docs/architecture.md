@@ -20,6 +20,10 @@ sources (or "the KB doesn't cover this"), and the queue it belongs in. The agent
                   strong flags: advice request, complaint, KYC decision, AML, account compromise, injection
                   weak flags: refund, scam, signal...  → note for the agent only
    │
+ 1b pii.py        mask personal data: card (Luhn), IBAN (mod-97), email, phone, wallet, document and
+                  account numbers → [CARD_1], [EMAIL_1]...; mapping stays in the process.
+                  Steps 2-4 see only the masked text.
+   │
  2 llm.py         ONE Claude call, structured output (Pydantic schema LLMOutput)
    + prompt.py    system = rules + whole KB, cached 1 h         ← phase 1
                   system = rules; top-6 chunks in the user turn ← phase 2 (retrieval.py + embeddings.py)
@@ -39,6 +43,8 @@ sources (or "the KB doesn't cover this"), and the queue it belongs in. The agent
                   agent_review  · draft ready to check and send
                   agent_answer  · KB doesn't cover it / low confidence: agent answers
                   escalate → compliance > kyc_team > complaints > senior_support (+ holding reply)
+   │
+ 6 unmask         placeholders → values for the agent (cards and IBANs as last four only)
    ▼
  TriageResult → agent (route, labels, draft, sources grouped by page, reasons, guard notes, cost)
 ```
@@ -58,6 +64,7 @@ into the real traffic mix and acceptance per segment, which replace the business
 | Knowledge base build | `kb/build_kb.py`, `kb/raw/`, `kb/chunks.jsonl`, `kb/sops/` | 1 (SOPs: 2) |
 | Pipeline | `copilot/pipeline.py` orchestrates steps 1-5 | 1 |
 | Hard-rule enforcement | `prefilter.py`, `postcheck.py`, `templates.py`, `verifier.py` | 1 |
+| Personal-data masking | `pii.py` (before any external call, restored for the agent) | 1 |
 | Routing policy | `router.py`, `config/routing.toml` | 1 (edited by support leads in 2) |
 | Retrieval | `retrieval.py` (BM25 + RRF), `embeddings.py` (local multilingual model) | 2, opt-in `sonnet-rag` |
 | Interfaces | `__main__.py` (`triage`, `batch`, `serve`, `smoke`), `web.py` | 1 |

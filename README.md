@@ -20,6 +20,7 @@ guards and a verifier**, not only by the prompt.
 ```
 ticket ─► prefilter.py   strong flags act (advice, complaint, KYC decision, AML, compromise, injection);
                          weak flags (refund, scam, signal...) only add a "check" note
+       ─► pii.py         personal data → [CARD_1], [EMAIL_1]... before any external LLM call; restored at the end
        ─► llm.py         one Claude call, KB in a 1-hour cached prompt → structured JSON: classification,
                          answer_mode, draft (+ English rendering), citations, claims, unknowns, kb_conflicts
        ─► [cascade]      optional: cheap model first, stronger model re-drafts doubtful outputs
@@ -39,7 +40,7 @@ ticket ─► prefilter.py   strong flags act (advice, complaint, KYC decision, 
 ```bash
 pip install -r requirements.txt
 python kb/build_kb.py              # chunks from kb/raw snapshots (--fetch re-downloads, --with-sops adds SOPs)
-python -m pytest -q                # 59 tests: guards, routing, retrieval, pilot log, API request shape; no API key
+python -m pytest -q                # 83 tests: guards, PII masking, routing, retrieval, pilot log, API path; no API key
 
 # offline, no API key: rules + lexical-search baseline
 python -m copilot triage --config mock --text "Can you approve my KYC manually?"
@@ -60,17 +61,17 @@ python -m copilot business-case                  # regenerates BUSINESS_CASE.md 
 Configs (`copilot/llm.py`): `mock` (no LLM) · `haiku` / `sonnet` / `opus` (Claude 5.5 models at effort
 `low`, each with the Haiku verifier) · `cascade` (Haiku, Sonnet re-drafts doubtful outputs) ·
 `sonnet-noverify` (ablation: what the verifier adds) · `sonnet-rag` (phase 2: hybrid BM25 + multilingual-embedding top-6 instead of the
-whole KB). A full eval run is 89 tickets × 2 calls; at list prices well under $1 per config.
+whole KB). A full eval run is 92 tickets × 2 calls; at list prices well under $1 per config.
 
 ## Repository
 
 ```
 copilot/   pipeline.py prefilter.py llm.py prompt.py postcheck.py verifier.py router.py templates.py
-           retrieval.py embeddings.py audit.py kb.py schema.py evaluate.py business_case.py web.py __main__.py (CLI)
+           retrieval.py embeddings.py audit.py pii.py kb.py schema.py evaluate.py business_case.py web.py __main__.py (CLI)
 config/    routing.toml (escalation rules = SOP as configuration)
 kb/        build_kb.py · raw/ (HTML snapshots, fetched 2026-11-16) · pages/ (readable) · chunks.jsonl (29 chunks,
            9 marked copy_of) · sops/ (example internal SOP, off by default)
-eval/      tickets.jsonl (89 labelled tickets, 7 languages, incl. benign and adversarial; chunk labels for retrieval) · results/<config>.json
+eval/      tickets.jsonl (92 labelled tickets, 7 languages, incl. benign, adversarial and personal-data; chunk labels for retrieval) · results/<config>.json
            · sample_queue.csv
 tests/     test_guards.py (hard rules, one test per issue) · test_platform.py (routing, retrieval, batch, API path) · test_pilot_log.py
 .github/   workflows/ci.yml (tests + safety gate)
@@ -79,7 +80,7 @@ tests/     test_guards.py (hard rules, one test per issue) · test_platform.py (
 ## What is mocked or simplified, and what the real version does
 - **UI**: CLI, batch CSV and a one-page local web UI. Real: helpdesk sidebar app; the result is written as a
   private note with tags and the suggested queue.
-- **Eval data**: 89 synthetic tickets, labels are sets of acceptable answers. Real: labelled tickets from the
+- **Eval data**: 92 synthetic tickets, labels are sets of acceptable answers. Real: labelled tickets from the
   shadow week and pilot, plus an LLM judge calibrated on human grades.
 - **Business-case inputs** (AHT, wages, traffic mix, minutes saved) are explicit assumptions in
   `copilot/business_case.py`, replaced by pilot measurements (`docs/phase1.md`).
