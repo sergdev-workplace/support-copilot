@@ -26,6 +26,9 @@ The co-pilot never sends anything; an agent reviews every draft.
 Stop rule at any step: one shipped trading-advice or KYC/complaint/AML decision → back to shadow,
 add the case to `eval/tickets.jsonl` and `docs/issues_log.md`, fix, re-run the gate.
 
+KB refresh (weekly, ISS-37): `python kb/build_kb.py --fetch`, review the diff of `kb/pages/*.md` with the
+support lead, run `eval --gate`, deploy. Every logged draft records the KB hash it was made with.
+
 ## How an agent works on day 1
 
 1. Paste the ticket into `http://127.0.0.1:8000` (or open the row in the batch CSV).

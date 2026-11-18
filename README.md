@@ -8,10 +8,12 @@ guards and a verifier**, not only by the prompt.
 | Read | What |
 |---|---|
 | [`BUSINESS_CASE.md`](BUSINESS_CASE.md) | One page: is it worth running at 10K tickets/month, and with which configuration |
+| [`docs/architecture.md`](docs/architecture.md) | What runs where: one ticket end to end, components, phase 1 vs phase 2 |
+| [`docs/design_review.md`](docs/design_review.md) | Requirement → code → evidence; decisions vs rejected alternatives; known limits |
 | [`docs/phase1.md`](docs/phase1.md) | Ship ASAP: what is cut, shadow → pilot → rollout, how agents use it |
 | [`docs/phase2.md`](docs/phase2.md) | Scale: what is implemented (routing config, SOPs, retrieval, cascade, CI) and what is next |
-| [`docs/architecture.md`](docs/architecture.md) | What runs where: one ticket end to end, components, phase 1 vs phase 2 |
-| [`docs/decisions.md`](docs/decisions.md) | Design decisions to discuss |
+| [`docs/decisions.md`](docs/decisions.md) | Design decisions in detail |
+| [`docs/llm_providers.md`](docs/llm_providers.md) | Plan: OpenAI, DeepSeek, Gemini and local models behind the same guards |
 | [`docs/kb_issues.md`](docs/kb_issues.md) | Gaps, copies and contradictions in the knowledge base, and how each is handled |
 | [`docs/issues_log.md`](docs/issues_log.md) | Every problem found in this solution, how it was found, and how it was fixed |
 
@@ -89,7 +91,13 @@ tests/     test_guards.py (hard rules, one test per issue) · test_platform.py (
 - **Example SOP** in `kb/sops/` is invented to demonstrate the mechanism and is not Valetax policy.
 
 ## How it was built
-Built with Claude Code (agentic coding) in one working session plus a review round: plan → KB scrape and
-chunking → pipeline and guards → eval → business case → self-review with targeted probes against the guards
-and a check of every requirement in the task. Each defect found by tests, eval or review is recorded with its
-fix and covering test in [`docs/issues_log.md`](docs/issues_log.md).
+Built with Claude Code (agentic coding).
+
+- **Core (round R1, the assignment's scope):** KB snapshot and chunking, one-call pipeline, hard-rule guards,
+  router, eval with a no-LLM baseline, business case, CLI.
+- **Hardening rounds (R2-R6, beyond the timebox):** probes against the guards and a requirement-by-requirement
+  check (R2-R3), multilingual retrieval (R4), pilot feedback and audit log (R5), personal-data masking and a
+  design review (R6).
+
+Every defect found by tests, eval or review is recorded with its round, fix and covering test in
+[`docs/issues_log.md`](docs/issues_log.md).
