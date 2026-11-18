@@ -17,8 +17,8 @@ alternatives that were rejected, and what is honestly not done.
 | KB used as is, with gaps and inconsistencies | raw HTML snapshot, `copy_of` marking, `kb_conflicts` in output | `docs/kb_issues.md` |
 | Phase 1: ship ASAP | whole KB in a cached prompt, CLI / batch / web page, shadow → pilot plan | `docs/phase1.md` |
 | Phase 2: ~10K tickets/month, KB and SOPs grow | routing as config, SOPs as internal chunks, hybrid multilingual retrieval, cascade, CI gates, pilot log | `docs/phase2.md` |
-| Measure it | 92-ticket eval, segments, Wilson intervals, safety gate, no-LLM baseline | `eval/results/`, `python -m copilot compare` |
-| Business case: worth it at our volume, which configuration | `BUSINESS_CASE.md` generated from eval results | **gap: only the no-LLM baseline is measured (needs an API key)** |
+| Measure it | 92-ticket eval, segments, Wilson intervals, safety gate, no-LLM baseline, verifier ablation | `eval/results/`: gpt-5.5 96% usable, 0 violations, 100% escalation recall; baseline 56% |
+| Business case: worth it at our volume, which configuration | `BUSINESS_CASE.md` generated from eval results | Yes: GPT-5.5 with code guards, net ~$1,460/month at 10K tickets, break-even ~5,200/month; Claude configs not yet measured |
 | Python, any LLM, agentic coding, CLI or web page | Python 3.12, Claude API, Claude Code, CLI + web page | `README.md` |
 
 ## 2. Decisions and the alternatives rejected
@@ -42,7 +42,7 @@ alternatives that were rejected, and what is honestly not done.
 
 | Limit | Impact | Next step |
 |---|---|---|
-| No real LLM run yet | Business case cannot name a configuration | Run `eval` for haiku, sonnet, opus, cascade, sonnet-noverify with a key (~$3) |
+| Measured on one provider, one run each, on the set the fixes were made on | Optimistic; Claude configs unknown | Shadow week on real tickets; Anthropic key → Claude configs; 3 runs per config (ISS-35) |
 | Eval is synthetic, written by the same author | Optimistic for in-distribution phrasing | Shadow week + pilot log replace it with real tickets (`pilot-report`) |
 | Each eval run is a single sample of a non-deterministic model | Small differences between configs may be noise | Run each config 3 times; report min for safety bars, mean and spread for quality (ISS-35) |
 | Model confidence is self-reported, not calibrated | `confidence_floor` and the cascade threshold are guesses | Calibrate on pilot feedback: acceptance rate by confidence bucket (ISS-36) |
@@ -50,4 +50,4 @@ alternatives that were rejected, and what is honestly not done.
 | Regex pre-filter and guards in 7 languages | Maintenance; unseen phrasings | Verifier covers semantics; misses become eval cases; ablation decides if both are needed |
 | KB snapshot refresh is manual | Stale answers if Valetax changes a page | Weekly `build_kb.py --fetch` + diff review + eval gate (phase 1); ingestion pipeline (phase 2) (ISS-37) |
 | Names and addresses are not masked | Some PII still reaches the provider | NER in phase 2; DPA sign-off in phase 1 |
-| Claude only | Vendor dependence | `docs/llm_providers.md`: two narrow contracts, one OpenAI-compatible adapter, ~4 days |
+| Two providers (Claude, OpenAI) | DeepSeek, Gemini, local models not wired | `docs/llm_providers.md`: generic OpenAI-compatible adapter, ~3 days |

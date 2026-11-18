@@ -42,7 +42,7 @@ ticket ─► prefilter.py   strong flags act (advice, complaint, KYC decision, 
 ```bash
 pip install -r requirements.txt
 python kb/build_kb.py              # chunks from kb/raw snapshots (--fetch re-downloads, --with-sops adds SOPs)
-python -m pytest -q                # 83 tests: guards, PII masking, routing, retrieval, pilot log, API path; no API key
+python -m pytest -q                # 92 tests: guards, PII masking, routing, retrieval, pilot log, Claude/OpenAI request paths; no API key
 
 # offline, no API key: rules + lexical-search baseline
 python -m copilot triage --config mock --text "Can you approve my KYC manually?"
@@ -53,17 +53,23 @@ python -m copilot pilot-report                   # traffic mix + sent/edited/dis
 pip install -r requirements-rag.txt   # phase-2 retrieval: local multilingual embeddings (0.22 GB model)
 python -m copilot retrieval-eval    # chunk recall@k: bm25 vs dense vs hybrid, English vs other languages
 
-# with Claude (export ANTHROPIC_API_KEY=...)
-python -m copilot smoke --config sonnet          # 2 calls: request accepted, output parses, cache read
-python -m copilot eval --config haiku            # also: sonnet, opus, cascade, sonnet-noverify, sonnet-rag
+# with an LLM: keys in the environment or in a git-ignored .env (OPENAI_API_KEY / ANTHROPIC_API_KEY)
+python -m copilot smoke --config gpt-5.5         # 2 calls: request accepted, output parses, cache read
+python -m copilot eval --config gpt-5.5 --gate   # also: gpt-5.5-noverify; Claude: haiku, sonnet, opus, cascade, ...
 python -m copilot compare                        # table of all eval runs
+python -m copilot rescore --config gpt-5.5       # re-score stored outputs after a label fix (no API calls)
 python -m copilot business-case                  # regenerates BUSINESS_CASE.md from eval results
 ```
 
-Configs (`copilot/llm.py`): `mock` (no LLM) · `haiku` / `sonnet` / `opus` (Claude 5.5 models at effort
+**Measured so far** (92 tickets): `gpt-5.5` and `gpt-5.5-noverify` 96% usable drafts, 0 hard-rule violations,
+100% escalation recall, 0% false escalations, $0.013-0.019/ticket; no-LLM baseline 56%. Claude configs are
+built and tested against a fake API but not yet measured (no Anthropic key in this environment).
+
+Configs (`copilot/llm.py`): `mock` (no LLM) · `gpt-5.5` (OpenAI GPT-5.5, effort low, + GPT-5.5 verifier) ·
+`gpt-5.5-noverify` (code guards only) · `haiku` / `sonnet` / `opus` (Claude 5.5 models at effort
 `low`, each with the Haiku verifier) · `cascade` (Haiku, Sonnet re-drafts doubtful outputs) ·
 `sonnet-noverify` (ablation: what the verifier adds) · `sonnet-rag` (phase 2: hybrid BM25 + multilingual-embedding top-6 instead of the
-whole KB). A full eval run is 92 tickets × 2 calls; at list prices well under $1 per config.
+whole KB). A full eval run is 92 tickets × up to 2 calls: ~$1.80 on GPT-5.5, well under $1 on Claude Haiku/Sonnet.
 
 ## Repository
 

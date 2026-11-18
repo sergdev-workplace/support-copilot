@@ -315,3 +315,23 @@ def test_iss23_on_topic_answer_passes():
                                citations=["deposit#where-can-i-view-my-deposit-and-withdrawal-histo"]),
                            "Where can I see my withdrawal history?", holding_required=False)
     assert o.answer_mode == "answer"
+
+
+# --- ISS-38: found by the first real LLM eval (gpt-5.5) --------------------------------------
+
+def test_iss38_verifier_rejecting_a_decline_keeps_the_decline():
+    decline = out(answer_mode="decline_trading_advice", requests_trading_advice=True, citations=[],
+                  classification=cls(category="trading_advice"),
+                  draft_reply="We can't give trading signals. We are happy to help with your account.",
+                  draft_reply_en="We can't give trading signals. We are happy to help with your account.")
+    v = Verdict(unsupported_statements=["We can't give trading signals."], gives_trading_advice=False,
+                states_outcome=False, reason="")
+    r = triage_with(decline, "Send me the best signals for today", FakeVerifier(v))
+    assert r.answer_mode == "decline_trading_advice" and r.route == "agent_review"
+
+
+def test_iss38_partial_answer_goes_to_an_agent():
+    partial = out(unknowns=["Whether Skrill is accepted"])
+    r = triage_with(partial, "What is the minimum deposit, and do you accept Skrill?")
+    assert r.answer_mode == "answer" and r.route == "agent_answer"
+    assert any(x.startswith("partial answer") for x in r.reasons)

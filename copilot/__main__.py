@@ -117,12 +117,22 @@ def smoke(config: str) -> int:
     return 0 if ok else 1
 
 
+def _load_env() -> None:
+    """API keys from the project's .env (git-ignored); real environment variables win."""
+    try:
+        from dotenv import load_dotenv
+    except ImportError:
+        return
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env", override=False)
+
+
 def main(argv=None) -> int:
     for stream in (sys.stdout, sys.stderr):  # Windows consoles: print non-Latin tickets
         try:
             stream.reconfigure(encoding="utf-8")
         except Exception:
             pass
+    _load_env()
     ap = argparse.ArgumentParser(prog="copilot")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
@@ -150,6 +160,8 @@ def main(argv=None) -> int:
 
     sub.add_parser("compare", help="table of all eval results")
     sub.add_parser("business-case", help="regenerate BUSINESS_CASE.md")
+    rs = sub.add_parser("rescore", help="re-score stored outputs after a label fix (no API calls)")
+    rs.add_argument("--config", required=True)
     r = sub.add_parser("retrieval-eval", help="phase-2 chunk recall@k per retrieval mode and language")
     r.add_argument("--k", default="3,6", help="comma-separated k values")
     r.add_argument("--mode", default="bm25,dense,hybrid", help="comma-separated: bm25, dense, hybrid")
@@ -206,6 +218,9 @@ def main(argv=None) -> int:
             for x in low:
                 print(f"GATE FAIL: hybrid recall {x} < {args.min_recall}", file=sys.stderr)
             return 1 if low else 0
+    elif args.cmd == "rescore":
+        from . import evaluate
+        print(json.dumps(evaluate.rescore(args.config), ensure_ascii=False, indent=2))
     elif args.cmd == "pilot-report":
         from . import audit
         rep = audit.report(Path(args.log) if args.log else None)

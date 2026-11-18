@@ -24,7 +24,7 @@ sources (or "the KB doesn't cover this"), and the queue it belongs in. The agent
                   account numbers → [CARD_1], [EMAIL_1]...; mapping stays in the process.
                   Steps 2-4 see only the masked text.
    │
- 2 llm.py         ONE Claude call, structured output (Pydantic schema LLMOutput)
+ 2 llm.py         ONE LLM call (Claude or OpenAI GPT-5.5), structured output (Pydantic schema LLMOutput)
    + prompt.py    system = rules + whole KB, cached 1 h         ← phase 1
                   system = rules; top-6 chunks in the user turn ← phase 2 (retrieval.py + embeddings.py)
                   returns: category, urgency, language, sentiment, answer_mode,
@@ -36,7 +36,7 @@ sources (or "the KB doesn't cover this"), and the queue it belongs in. The agent
                    every fact (number, duration, "a few days") is in the ticket or a same-topic cited chunk ·
                    KYC/complaint/AML outcome or date → holding reply · failures → localized safe template
    │
- 4 verifier.py    second Claude call (Haiku): reads draft next to its cited chunks →
+ 4 verifier.py    optional second call (Haiku or GPT-5.5): reads draft next to its cited chunks →
                   unsupported statement / advice / implied outcome → same templates as above
    │
  5 router.py      rules from config/routing.toml (labels OR strong flags)

@@ -18,8 +18,8 @@ class Copilot:
             if self.config.escalate_model else None
         )
         if verifier is None and self.config.verify and self.config.model:
-            from .verifier import LLMVerifier
-            verifier = LLMVerifier()
+            from .verifier import make_verifier
+            verifier = make_verifier(self.config.verifier_model)
         self.verifier = verifier
 
     @staticmethod
@@ -92,8 +92,12 @@ class Copilot:
                 elif verdict.unsupported_statements:
                     guard_actions.append(f"verifier: unsupported {verdict.unsupported_statements}")
                     out.unknowns = out.unknowns + [f"Unsupported by KB: {s}" for s in verdict.unsupported_statements]
+                    # Keep the mode (ISS-38): an advice request stays a decline, a specialist case a
+                    # holding reply; only a factual answer falls back to "we will confirm".
                     if hold or out.answer_mode == "holding_reply":
                         postcheck.replace_with_template(out, "holding", "holding_reply", guard_actions)
+                    elif out.answer_mode == "decline_trading_advice" or pf.trading_advice:
+                        postcheck.replace_with_template(out, "decline", "decline_trading_advice", guard_actions)
                     else:
                         postcheck.replace_with_template(out, "abstain", "abstain", guard_actions)
             except Exception as e:

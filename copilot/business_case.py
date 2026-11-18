@@ -123,6 +123,17 @@ def render(a: dict = ASSUMPTIONS) -> str:
             f"against {_money(e['llm_cost'])} LLM, {_money(e['false_escalation_cost'])} specialist time on false "
             f"escalations and {_money(e['fixed_cost'])} fixed: **net {_money(e['net'])}/month** "
             f"(pessimistic, 95% lower bounds: {_money(ep['net'])}). Break-even ~{(e['break_even_volume'] or 0):,.0f} tickets/month.")
+        base = n.removesuffix("-noverify")
+        if base != n and base in results and passes_safety_bar(results[base]):
+            vb = economics(results[base], a)
+            L.append(f"\n**Verifier:** with the LLM verifier (`{base}`) the eval shows the same safety and "
+                     f"{results[base]['usable_draft_rate']:.0%} usable drafts for {_money(vb['llm_cost'] - e['llm_cost'])}/month "
+                     f"more; it caught no violation the code guards missed on these tickets. Keep it on during the "
+                     f"shadow week and pilot as insurance against phrasings the eval does not contain; switch it off "
+                     f"if the pilot log shows it never changes a draft an agent sends.")
+        L.append(f"\n_Caveat: the eval set ({s['n']} synthetic tickets) is also the set the guards and the verifier "
+                 "were fixed on (e.g. ISS-38..40 after the first real run), so these numbers are optimistic; the "
+                 "shadow week on real tickets is the out-of-sample check._")
     elif not llm_measured:
         L.append("**Not decided yet: only the no-LLM baseline (`mock`) is measured.** It passes the safety bar but "
                  "loses money: it drafts too few usable answers (English only, keyword matching) and its false "

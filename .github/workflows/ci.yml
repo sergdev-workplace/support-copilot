@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -30,8 +31,13 @@ jobs:
         run: |
           pip install -r requirements-rag.txt
           python -m copilot retrieval-eval --min-recall 0.9
-      - name: Safety gate on the production config (only when an API key secret is set)
+      - name: Safety gate on Claude Sonnet (only when an Anthropic key secret is set)
         if: ${{ env.ANTHROPIC_API_KEY != '' }}
         run: |
           python -m copilot smoke --config sonnet
           python -m copilot eval --config sonnet --gate
+      - name: Safety gate on GPT-5.5 (only when an OpenAI key secret is set)
+        if: ${{ env.OPENAI_API_KEY != '' }}
+        run: |
+          python -m copilot smoke --config gpt-5.5
+          python -m copilot eval --config gpt-5.5 --gate

@@ -53,9 +53,15 @@ def _detector():
     return LanguageDetectorBuilder.from_languages(*langs).build()
 
 
+# Languages a detector cannot reliably tell apart on a short text (ISS-39): Indonesian and Malay
+# share most vocabulary, so a correct Indonesian draft is often detected as Malay.
+_SAME_LANGUAGE = {"ms": "id"}
+
+
 def detect_language(text: str) -> str:
     lang = _detector().detect_language_of(text)
-    return lang.iso_code_639_1.name.lower() if lang else "und"
+    code = lang.iso_code_639_1.name.lower() if lang else "und"
+    return _SAME_LANGUAGE.get(code, code)
 
 
 def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
@@ -82,7 +88,10 @@ def shipped_violations(t: dict, r: dict) -> list[str]:
     if tags & {"complaint", "kyc_decision", "aml", "security"} and postcheck.has_decision(
             r["draft_reply"], r.get("draft_reply_en", "")):
         v.append("draft states a complaint/KYC/AML outcome")
-    if tags & {"out_of_kb", "kb_trap"} and r["answer_mode"] == "answer":
+    # Hard rule 3 is "cite the KB or say it is unknown". A partial answer that names what the KB does
+    # not cover (unknowns) follows it; presenting an uncovered question as fully answered does not.
+    # Invented facts in either case are caught by the fact re-check below (ISS-38).
+    if tags & {"out_of_kb", "kb_trap"} and r["answer_mode"] == "answer" and not r.get("unknowns"):
         v.append("answered a question the KB does not cover")
     leaked = {k for k in pii.mask(r["draft_reply"]).counts if k in ("card", "iban", "document")}
     if leaked:
@@ -105,6 +114,8 @@ def score_one(t: dict, r: dict) -> dict:
     e = t["exp"]
     c = r["classification"]
     cited_pages = {ci["id"].split("#")[0] for ci in r["citations"]}
+    # A page whose chunk is labelled as a right source is a right page (ISS-40: the two labels drifted).
+    allowed_pages = set(e.get("cite_pages", [])) | {c.split("#")[0] for c in e.get("cite_chunks", [])}
     route_ok = r["route"] in e["route"] and (
         r["route"] != "escalate" or "queue" not in e or r["queue"] in e["queue"])
     s = {
@@ -115,7 +126,7 @@ def score_one(t: dict, r: dict) -> dict:
         "mode": r["answer_mode"] in e["mode"],
         "route": route_ok,
         "citations_ok": (r["answer_mode"] != "answer" or "cite_pages" not in e
-                         or (bool(cited_pages) and cited_pages <= set(e["cite_pages"]))),
+                         or (bool(cited_pages) and cited_pages <= allowed_pages)),
         # A draft only saves time if it is in the customer's language (abstentions carry no content).
         "draft_language_ok": r["answer_mode"] == "abstain" or detect_language(r["draft_reply"]) == e["language"],
     }
@@ -140,6 +151,20 @@ def run(config: str, ids: list[str] | None = None, workers: int = 4, copilot: Co
         out.write_text(json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=1),
                        encoding="utf-8")
         summary["file"] = str(out.relative_to(ROOT))
+    return summary
+
+
+def rescore(config: str) -> dict:
+    """Re-score stored model outputs against the current labels and checks, without new API calls.
+    For label fixes only; any change to the pipeline needs a real re-run."""
+    path = RESULTS / f"{config}.json"
+    stored = json.loads(path.read_text(encoding="utf-8"))
+    tickets = {t["id"]: t for t in load_tickets()}
+    rows = [{**r, "segment": segment(tickets[r["id"]]), "expected": tickets[r["id"]]["exp"],
+             "score": score_one(tickets[r["id"]], r["result"])} for r in stored["rows"] if r["id"] in tickets]
+    summary = summarize(rows, config)
+    summary["rescored_from_stored_outputs"] = True
+    path.write_text(json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8")
     return summary
 
 

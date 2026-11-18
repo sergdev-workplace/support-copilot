@@ -18,7 +18,7 @@ The co-pilot never sends anything; an agent reviews every draft.
 
 | Step | Days | What | Exit criterion |
 |---|---|---|---|
-| 0. Setup | 1 | Compliance sign-off on sending ticket text to the LLM provider (data processing agreement, retention); API key in a secret store, `python -m copilot smoke --config sonnet`, eval run on haiku/sonnet/opus/cascade, pick config by `BUSINESS_CASE.md` | Sign-off; smoke OK; chosen config passes the safety bar (0 violations, 100% escalation recall) |
+| 0. Setup | 1 | Compliance sign-off on sending ticket text to the LLM provider (data processing agreement, retention); API key in a secret store, `python -m copilot smoke --config gpt-5.5`, eval on the candidate configs (measured: `gpt-5.5`, `gpt-5.5-noverify`; Claude configs need an Anthropic key), pick config by `BUSINESS_CASE.md` | Sign-off; smoke OK; chosen config passes the safety bar (0 violations, 100% escalation recall) |
 | 1. Shadow | 3-5 | `python -m copilot batch` over last month's tickets (exported CSV) and over each day's incoming queue. Nobody sees drafts; team lead reviews 100 results/day | No hard-rule violation in human review; false escalation rate < 5%; real traffic mix measured (replaces the business-case assumption) |
 | 2. Pilot | 5 | 3-5 agents use `serve` (or the batch CSV) for deposit/withdrawal/account/verification tickets; they click *Sent as is / Edited / Discarded* (and "route was wrong") under each draft; `python -m copilot pilot-report` shows the result per segment | ≥ 50% sent as is or edited and < 25% discarded; no compliance incident; agents want to keep it |
 | 3. Rollout | - | All agents; specialist queues receive the suggested route | Weekly eval + pilot metrics stay within the gates |

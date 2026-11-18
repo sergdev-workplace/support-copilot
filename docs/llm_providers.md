@@ -1,7 +1,9 @@
 # Plan: any LLM provider (OpenAI, DeepSeek, Gemini, local models)
 
-Status: **plan, not implemented.** Today the pipeline has two backends: Claude (`AnthropicBackend`)
-and the no-LLM baseline (`MockBackend`). This page describes how to add other providers without
+Status: **OpenAI implemented and measured** (`copilot/openai_backend.py`, configs `gpt-5.5`,
+`gpt-5.5-noverify`; see ISS-38..41 in `issues_log.md`). DeepSeek, Gemini and local models: plan below.
+The OpenAI adapter uses the Responses API with strict structured outputs; the generic
+OpenAI-compatible adapter for the rest follows this page. How to add providers without
 touching the parts that make the co-pilot safe.
 
 ## 1. What changes and what does not

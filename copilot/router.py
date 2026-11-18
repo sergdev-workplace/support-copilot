@@ -72,6 +72,10 @@ def route(out: LLMOutput, pf: PrefilterFlags) -> tuple[str, str | None, list[str
     if out.answer_mode == "abstain":
         reasons.append("knowledge base does not cover the question")
         return "agent_answer", None, reasons
+    if out.answer_mode == "answer" and out.unknowns:
+        # Partial answer (ISS-38): the sendable part is grounded, the rest needs an agent.
+        reasons.append("partial answer: the KB does not cover " + "; ".join(out.unknowns)[:300])
+        return "agent_answer", None, reasons
     if out.answer_mode == "answer" and out.confidence < cfg["confidence_floor"]:
         reasons.append(f"low model confidence ({out.confidence:.2f})")
         return "agent_answer", None, reasons

@@ -178,7 +178,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0019585000118240714,
+     "latency_s": 0.0012197000905871391,
      "calls": 1
     },
     "pii_masked": {}
@@ -289,7 +289,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0003844999009743333,
+     "latency_s": 0.0002919000107795,
      "calls": 1
     },
     "pii_masked": {}
@@ -395,7 +395,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0004430999979376793,
+     "latency_s": 0.00027379998937249184,
      "calls": 1
     },
     "pii_masked": {}
@@ -482,7 +482,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 7.71000050008297e-05,
+     "latency_s": 5.030003376305103e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -569,7 +569,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 6.220000796020031e-05,
+     "latency_s": 3.9199949242174625e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -677,7 +677,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00025120005011558533,
+     "latency_s": 0.00025320006534457207,
      "calls": 1
     },
     "pii_masked": {}
@@ -776,7 +776,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.770001396536827e-05,
+     "latency_s": 4.509999416768551e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -883,7 +883,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002533000661060214,
+     "latency_s": 0.00025539996568113565,
      "calls": 1
     },
     "pii_masked": {}
@@ -991,7 +991,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00023210002109408379,
+     "latency_s": 0.00024640001356601715,
      "calls": 1
     },
     "pii_masked": {}
@@ -1099,7 +1099,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.000251100049354136,
+     "latency_s": 0.00024919991847127676,
      "calls": 1
     },
     "pii_masked": {}
@@ -1207,7 +1207,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002457000082358718,
+     "latency_s": 0.00025079993065446615,
      "calls": 1
     },
     "pii_masked": {}
@@ -1294,7 +1294,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.7899939343333244e-05,
+     "latency_s": 5.8399979025125504e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -1400,7 +1400,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00022689998149871826,
+     "latency_s": 0.00023809995036572218,
      "calls": 1
     },
     "pii_masked": {}
@@ -1497,7 +1497,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002562999725341797,
+     "latency_s": 0.0002522999420762062,
      "calls": 1
     },
     "pii_masked": {}
@@ -1603,7 +1603,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00023070001043379307,
+     "latency_s": 0.00024750002194195986,
      "calls": 1
     },
     "pii_masked": {}
@@ -1709,7 +1709,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00023209990467876196,
+     "latency_s": 0.00023989996407181025,
      "calls": 1
     },
     "pii_masked": {}
@@ -1818,7 +1818,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024640001356601715,
+     "latency_s": 0.0002460000105202198,
      "calls": 1
     },
     "pii_masked": {}
@@ -1904,7 +1904,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.269997589290142e-05,
+     "latency_s": 6.19000056758523e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -1997,7 +1997,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002728999825194478,
+     "latency_s": 0.0004298000130802393,
      "calls": 1
     },
     "pii_masked": {}
@@ -2104,7 +2104,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002546000760048628,
+     "latency_s": 0.00025189993903040886,
      "calls": 1
     },
     "pii_masked": {}
@@ -2200,7 +2200,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002543999580666423,
+     "latency_s": 0.0002568999771028757,
      "calls": 1
     },
     "pii_masked": {}
@@ -2309,7 +2309,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002482000272721052,
+     "latency_s": 0.00024770002346485853,
      "calls": 1
     },
     "pii_masked": {}
@@ -2405,7 +2405,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.449998959898949e-05,
+     "latency_s": 4.980002995580435e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -2501,7 +2501,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024309998843818903,
+     "latency_s": 0.00025130005087703466,
      "calls": 1
     },
     "pii_masked": {}
@@ -2591,7 +2591,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.820005804300308e-05,
+     "latency_s": 3.869994543492794e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -2686,7 +2686,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.670004662126303e-05,
+     "latency_s": 4.369998350739479e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -2778,7 +2778,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.8100057281553745e-05,
+     "latency_s": 4.20999713242054e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -2888,7 +2888,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024359999224543571,
+     "latency_s": 0.0002831999445334077,
      "calls": 1
     },
     "pii_masked": {}
@@ -2973,7 +2973,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.379990812391043e-05,
+     "latency_s": 3.9199949242174625e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -3058,7 +3058,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.260001540184021e-05,
+     "latency_s": 3.200001083314419e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -3147,7 +3147,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.5800039768218994e-05,
+     "latency_s": 3.460003063082695e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -3238,7 +3238,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 5.159992724657059e-05,
+     "latency_s": 4.5599997974932194e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -3328,7 +3328,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.539999645203352e-05,
+     "latency_s": 4.6200002543628216e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -3416,7 +3416,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.220008850097656e-05,
+     "latency_s": 4.439998883754015e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -3503,7 +3503,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.9499951526522636e-05,
+     "latency_s": 4.1400082409381866e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -3593,7 +3593,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002465000143274665,
+     "latency_s": 0.00025050004478543997,
      "calls": 1
     },
     "pii_masked": {}
@@ -3686,7 +3686,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.0100072510540485e-05,
+     "latency_s": 3.920006565749645e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -3801,7 +3801,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024960003793239594,
+     "latency_s": 0.0002666000509634614,
      "calls": 1
     },
     "pii_masked": {}
@@ -3899,7 +3899,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00022569997236132622,
+     "latency_s": 0.00023250002413988113,
      "calls": 1
     },
     "pii_masked": {}
@@ -4002,7 +4002,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00023069989401847124,
+     "latency_s": 0.0002266999799758196,
      "calls": 1
     },
     "pii_masked": {}
@@ -4088,7 +4088,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 2.3600063286721706e-05,
+     "latency_s": 2.010003663599491e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -4127,7 +4127,8 @@
      "agent_review"
     ],
     "cite_pages": [
-     "open_account"
+     "open_account",
+     "verify"
     ],
     "urgency": [
      "low"
@@ -4184,7 +4185,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024729990400373936,
+     "latency_s": 0.00022309995256364346,
      "calls": 1
     },
     "pii_masked": {}
@@ -4280,7 +4281,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00026240001898258924,
+     "latency_s": 0.00025159993674606085,
      "calls": 1
     },
     "pii_masked": {}
@@ -4374,7 +4375,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.4199987314641476e-05,
+     "latency_s": 4.1899969801306725e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -4460,7 +4461,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.6800047382712364e-05,
+     "latency_s": 2.9399991035461426e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -4554,7 +4555,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0003711999161168933,
+     "latency_s": 0.0002405999694019556,
      "calls": 1
     },
     "pii_masked": {}
@@ -4648,7 +4649,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00025589996948838234,
+     "latency_s": 0.0002471000188961625,
      "calls": 1
     },
     "pii_masked": {}
@@ -4745,7 +4746,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00022719998378306627,
+     "latency_s": 0.00023180001880973577,
      "calls": 1
     },
     "pii_masked": {}
@@ -4831,7 +4832,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 2.450007013976574e-05,
+     "latency_s": 2.3799948394298553e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -4926,7 +4927,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002473999047651887,
+     "latency_s": 0.00024560000747442245,
      "calls": 1
     },
     "pii_masked": {}
@@ -5014,7 +5015,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.729993477463722e-05,
+     "latency_s": 4.039995837956667e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -5111,7 +5112,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024670001585036516,
+     "latency_s": 0.00026220001745969057,
      "calls": 1
     },
     "pii_masked": {}
@@ -5205,7 +5206,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.900002386420965e-05,
+     "latency_s": 4.830001853406429e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -5292,7 +5293,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.1599967516958714e-05,
+     "latency_s": 4.000007174909115e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -5405,7 +5406,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00023729994427412748,
+     "latency_s": 0.00024259998463094234,
      "calls": 1
     },
     "pii_masked": {}
@@ -5510,7 +5511,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024850002955645323,
+     "latency_s": 0.0002642000326886773,
      "calls": 1
     },
     "pii_masked": {}
@@ -5552,7 +5553,8 @@
     ],
     "cite_pages": [
      "deposit",
-     "withdraw"
+     "withdraw",
+     "verify"
     ],
     "urgency": [
      "low"
@@ -5608,7 +5610,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00023040000814944506,
+     "latency_s": 0.0002484000287950039,
      "calls": 1
     },
     "pii_masked": {}
@@ -5696,7 +5698,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.739993553608656e-05,
+     "latency_s": 4.029995761811733e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -5792,7 +5794,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.470003139227629e-05,
+     "latency_s": 3.550003748387098e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -5889,7 +5891,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.029995761811733e-05,
+     "latency_s": 4.12999652326107e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -5981,7 +5983,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.4499913454055786e-05,
+     "latency_s": 3.470003139227629e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -6094,7 +6096,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024850002955645323,
+     "latency_s": 0.00025919999461621046,
      "calls": 1
     },
     "pii_masked": {}
@@ -6209,7 +6211,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00025459995958954096,
+     "latency_s": 0.00026300002355128527,
      "calls": 1
     },
     "pii_masked": {}
@@ -6302,7 +6304,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002397000789642334,
+     "latency_s": 0.0002543000737205148,
      "calls": 1
     },
     "pii_masked": {}
@@ -6405,7 +6407,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 3.8499943912029266e-05,
+     "latency_s": 4.47999918833375e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -6515,7 +6517,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024229998234659433,
+     "latency_s": 0.0002601000014692545,
      "calls": 1
     },
     "pii_masked": {}
@@ -6604,7 +6606,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 4.1500083170831203e-05,
+     "latency_s": 3.570003900676966e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -6715,7 +6717,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0003095000283792615,
+     "latency_s": 0.0002530000638216734,
      "calls": 1
     },
     "pii_masked": {}
@@ -6805,7 +6807,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002731999848037958,
+     "latency_s": 0.00024389999452978373,
      "calls": 1
     },
     "pii_masked": {}
@@ -6895,7 +6897,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00031729997135698795,
+     "latency_s": 0.00025310006458312273,
      "calls": 1
     },
     "pii_masked": {}
@@ -6992,7 +6994,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 5.0600036047399044e-05,
+     "latency_s": 4.169996827840805e-05,
      "calls": 1
     },
     "pii_masked": {}
@@ -7086,7 +7088,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00026759994216263294,
+     "latency_s": 0.0002695999573916197,
      "calls": 1
     },
     "pii_masked": {}
@@ -7178,7 +7180,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024530000519007444,
+     "latency_s": 0.0002506000455468893,
      "calls": 1
     },
     "pii_masked": {}
@@ -7267,7 +7269,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002576999831944704,
+     "latency_s": 0.00026530004106462,
      "calls": 1
     },
     "pii_masked": {}
@@ -7365,7 +7367,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00022579997312277555,
+     "latency_s": 0.0004646000452339649,
      "calls": 1
     },
     "pii_masked": {}
@@ -7459,7 +7461,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002305000089108944,
+     "latency_s": 0.0002442999975755811,
      "calls": 1
     },
     "pii_masked": {}
@@ -7556,7 +7558,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00022559997159987688,
+     "latency_s": 0.00024259998463094234,
      "calls": 1
     },
     "pii_masked": {}
@@ -7650,7 +7652,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00022689998149871826,
+     "latency_s": 0.0002351000439375639,
      "calls": 1
     },
     "pii_masked": {}
@@ -7744,7 +7746,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00021820003166794777,
+     "latency_s": 0.00022739998530596495,
      "calls": 1
     },
     "pii_masked": {}
@@ -7840,7 +7842,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024419999681413174,
+     "latency_s": 0.00024749990552663803,
      "calls": 1
     },
     "pii_masked": {}
@@ -7934,7 +7936,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002348999259993434,
+     "latency_s": 0.00023589993361383677,
      "calls": 1
     },
     "pii_masked": {}
@@ -8031,7 +8033,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002277999883517623,
+     "latency_s": 0.0002316000172868371,
      "calls": 1
     },
     "pii_masked": {}
@@ -8126,7 +8128,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002337999176234007,
+     "latency_s": 0.00023220002185553312,
      "calls": 1
     },
     "pii_masked": {}
@@ -8222,7 +8224,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002351000439375639,
+     "latency_s": 0.0002442999975755811,
      "calls": 1
     },
     "pii_masked": {}
@@ -8318,7 +8320,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002348999259993434,
+     "latency_s": 0.00024170009419322014,
      "calls": 1
     },
     "pii_masked": {}
@@ -8412,7 +8414,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002272001001983881,
+     "latency_s": 0.00024239998310804367,
      "calls": 1
     },
     "pii_masked": {}
@@ -8506,7 +8508,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00022549997083842754,
+     "latency_s": 0.00023020000662654638,
      "calls": 1
     },
     "pii_masked": {}
@@ -8600,7 +8602,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00022639997769147158,
+     "latency_s": 0.0002280999906361103,
      "calls": 1
     },
     "pii_masked": {}
@@ -8695,7 +8697,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002397000789642334,
+     "latency_s": 0.0002327000256627798,
      "calls": 1
     },
     "pii_masked": {}
@@ -8804,7 +8806,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00027760001830756664,
+     "latency_s": 0.0002731999848037958,
      "calls": 1
     },
     "pii_masked": {
@@ -8902,7 +8904,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.00024099997244775295,
+     "latency_s": 0.00023560004774481058,
      "calls": 1
     },
     "pii_masked": {
@@ -9005,7 +9007,7 @@
      "cache_read_tokens": 0,
      "cache_write_tokens": 0,
      "cost_usd": 0.0,
-     "latency_s": 0.0002559999702498317,
+     "latency_s": 0.0003261000383645296,
      "calls": 1
     },
     "pii_masked": {

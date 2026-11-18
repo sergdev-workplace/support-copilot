@@ -25,6 +25,9 @@ PRICING = {
     "claude-haiku-5-5": {"in": 0.10, "out": 0.50, "cache_read": 0.01, "cache_write": 0.20},
     "claude-sonnet-5-5": {"in": 2.00, "out": 10.00, "cache_read": 0.10, "cache_write": 4.00},
     "claude-opus-5-5": {"in": 4.00, "out": 20.00, "cache_read": 0.20, "cache_write": 8.00},
+    # OpenAI: caching is automatic, no write surcharge. Prices from public price trackers
+    # (2026-11-18), to confirm on OpenAI's pricing page. Output includes reasoning tokens.
+    "openai:gpt-5.5": {"in": 5.00, "out": 30.00, "cache_read": 0.50, "cache_write": 5.00},
 }
 VERIFIER_MODEL = "claude-haiku-5-5"
 
@@ -38,6 +41,7 @@ class Config:
     verify: bool = False               # second-opinion verifier on every draft
     retrieval_k: int | None = None     # phase 2: top-k chunks instead of the whole KB
     description: str = ""
+    verifier_model: str = VERIFIER_MODEL  # "openai:<model>" for an OpenAI verifier
 
 
 CONFIGS = {
@@ -55,6 +59,11 @@ CONFIGS = {
     "sonnet-rag": Config("sonnet-rag", "claude-sonnet-5-5", verify=True, retrieval_k=6,
                          description="Phase 2: Sonnet 5.5 with hybrid top-6 retrieval (BM25 + local "
                                      "multilingual embeddings) + verifier"),
+    # Other providers: model ids are "provider:model" (docs/llm_providers.md).
+    "gpt-5.5": Config("gpt-5.5", "openai:gpt-5.5", verify=True, verifier_model="openai:gpt-5.5",
+                      description="OpenAI GPT-5.5, reasoning effort low, + GPT-5.5 verifier"),
+    "gpt-5.5-noverify": Config("gpt-5.5-noverify", "openai:gpt-5.5",
+                               description="OpenAI GPT-5.5, reasoning effort low, code guards only, no LLM verifier"),
 }
 
 
@@ -236,4 +245,9 @@ class MockBackend:
 
 
 def make_backend(model: str | None, effort: str = "low", retrieval_k: int | None = None):
-    return MockBackend() if model is None else AnthropicBackend(model, effort, retrieval_k)
+    if model is None:
+        return MockBackend()
+    if model.startswith("openai:"):
+        from .openai_backend import OpenAIBackend
+        return OpenAIBackend(model.split(":", 1)[1], effort, retrieval_k)
+    return AnthropicBackend(model, effort, retrieval_k)
