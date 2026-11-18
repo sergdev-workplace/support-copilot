@@ -18,9 +18,9 @@ The co-pilot never sends anything; an agent reviews every draft.
 
 | Step | Days | What | Exit criterion |
 |---|---|---|---|
-| 0. Setup | 1 | API key in a secret store, `python -m copilot smoke --config sonnet`, eval run on haiku/sonnet/opus/cascade, pick config by `BUSINESS_CASE.md` | Smoke OK; chosen config passes the safety bar (0 violations, 100% escalation recall) |
+| 0. Setup | 1 | Compliance sign-off on sending ticket text to the LLM provider (data processing agreement, retention); API key in a secret store, `python -m copilot smoke --config sonnet`, eval run on haiku/sonnet/opus/cascade, pick config by `BUSINESS_CASE.md` | Sign-off; smoke OK; chosen config passes the safety bar (0 violations, 100% escalation recall) |
 | 1. Shadow | 3-5 | `python -m copilot batch` over last month's tickets (exported CSV) and over each day's incoming queue. Nobody sees drafts; team lead reviews 100 results/day | No hard-rule violation in human review; false escalation rate < 5%; real traffic mix measured (replaces the business-case assumption) |
-| 2. Pilot | 5 | 3-5 agents use `serve` (or the batch CSV) for deposit/withdrawal/account/verification tickets; they mark each draft *sent as is / edited / discarded* | ≥ 50% sent as is or lightly edited; no compliance incident; agents want to keep it |
+| 2. Pilot | 5 | 3-5 agents use `serve` (or the batch CSV) for deposit/withdrawal/account/verification tickets; they mark each draft *sent as is / edited / discarded* (needs ISS-30: feedback buttons + result log in the web page) | ≥ 50% sent as is or lightly edited; no compliance incident; agents want to keep it |
 | 3. Rollout | - | All agents; specialist queues receive the suggested route | Weekly eval + pilot metrics stay within the gates |
 
 Stop rule at any step: one shipped trading-advice or KYC/complaint/AML decision → back to shadow,

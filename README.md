@@ -10,6 +10,7 @@ guards and a verifier**, not only by the prompt.
 | [`BUSINESS_CASE.md`](BUSINESS_CASE.md) | One page: is it worth running at 10K tickets/month, and with which configuration |
 | [`docs/phase1.md`](docs/phase1.md) | Ship ASAP: what is cut, shadow → pilot → rollout, how agents use it |
 | [`docs/phase2.md`](docs/phase2.md) | Scale: what is implemented (routing config, SOPs, retrieval, cascade, CI) and what is next |
+| [`docs/architecture.md`](docs/architecture.md) | What runs where: one ticket end to end, components, phase 1 vs phase 2 |
 | [`docs/decisions.md`](docs/decisions.md) | Design decisions to discuss |
 | [`docs/kb_issues.md`](docs/kb_issues.md) | Gaps, copies and contradictions in the knowledge base, and how each is handled |
 | [`docs/issues_log.md`](docs/issues_log.md) | Every problem found in this solution, how it was found, and how it was fixed |

@@ -7,7 +7,7 @@ fix and the test or eval that now covers it. Severity: **critical** = a hard rul
 
 Rounds: **R1** = first build (2026-11-16); **R2** = self-review with probes + check against the task
 statement (2026-11-17); **R3** = implementing the R2 fixes (2026-11-17); **R4** = multilingual
-retrieval (2026-11-18).
+retrieval (2026-11-18); **R5** = architecture and business review (2026-11-18).
 
 ## Fixed
 
@@ -52,4 +52,8 @@ retrieval (2026-11-18).
 |---|---|---|---|---|
 | REQ-01 | R2, task check | critical | "Measure it": only the no-LLM baseline is measured; no API key in the build environment. | `export ANTHROPIC_API_KEY=...`; `smoke --config sonnet`; `eval` for haiku, sonnet, opus, cascade, sonnet-noverify, sonnet-rag (~$3 total). |
 | REQ-02 | R2, task check | critical | Business case cannot name a configuration until REQ-01. | `python -m copilot business-case` after REQ-01; check it still fits one page. |
+| ISS-30 | R5, architecture review | high | Phase-1 pilot plan says agents mark each draft *sent as is / edited / discarded*, but the web page has no way to record it and keeps no results. Without it the pilot cannot replace the business-case assumptions. | Web page: three feedback buttons + append each result and feedback to `out/pilot_log.jsonl`; `python -m copilot pilot-report` for acceptance per segment. |
+| ISS-31 | R5, architecture review | medium | No audit log: for a broker, every draft shown to an agent should be traceable (model, prompt version, KB snapshot, guard actions) in case of an "advice" complaint. Batch writes results; `serve` and `triage` do not. | Same log as ISS-30, with model, KB `FETCHED_AT`, prompt hash and guard actions per ticket. |
+| ISS-32 | R5, architecture review | medium | Ticket text (names, account numbers, sometimes card/ID data) goes to an external LLM; phase 1 did not mention it. | Phase-1 step 0 now requires compliance sign-off (DPA, retention). Masking of card/IBAN/document numbers before the LLM stays in phase 2. |
+| ISS-33 | R5, business review | high | Business case assumes 50% of traffic is answerable from the KB. The KB is 4 short pages; real broker traffic is largely account-specific ("where is my withdrawal #123"), which the KB cannot answer. The value may sit in triage, routing and translation more than in drafting. | Shadow week measures the real mix; the business case is regenerated from it. Account-data tools (phase 2) are the main lever if the in-KB share is low. |
 | REQ-09 | R2, task check | low | Repo will be private: reviewers need access, not just a link. | Create the private repo at the very end; invite the reviewers' GitHub accounts as collaborators. |
