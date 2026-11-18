@@ -6,7 +6,7 @@
   python -m copilot eval --config mock|haiku|sonnet|opus|cascade [--ids T01,T13] [--gate]
   python -m copilot compare
   python -m copilot business-case
-  python -m copilot retrieval-eval [--k 6]
+  python -m copilot retrieval-eval [--k 3,6] [--mode bm25,dense,hybrid]
   python -m copilot smoke [--config haiku]                      # 2 real API calls: schema, beta, cache
 """
 from __future__ import annotations
@@ -142,8 +142,12 @@ def main(argv=None) -> int:
 
     sub.add_parser("compare", help="table of all eval results")
     sub.add_parser("business-case", help="regenerate BUSINESS_CASE.md")
-    r = sub.add_parser("retrieval-eval", help="phase-2 BM25 recall@k per language")
-    r.add_argument("--k", type=int, default=6)
+    r = sub.add_parser("retrieval-eval", help="phase-2 chunk recall@k per retrieval mode and language")
+    r.add_argument("--k", default="3,6", help="comma-separated k values")
+    r.add_argument("--mode", default="bm25,dense,hybrid", help="comma-separated: bm25, dense, hybrid")
+    r.add_argument("--json", action="store_true")
+    r.add_argument("--min-recall", type=float, help="CI gate: exit 1 if hybrid recall at the largest k "
+                                                    "is below this for English or non-English tickets")
     sm = sub.add_parser("smoke", help="2 real API calls to check the integration")
     sm.add_argument("--config", default="haiku", choices=list(CONFIGS))
 
@@ -177,7 +181,18 @@ def main(argv=None) -> int:
         print(open(p, encoding="utf-8").read())
     elif args.cmd == "retrieval-eval":
         from . import evaluate
-        print(json.dumps(evaluate.retrieval_eval(args.k), indent=2))
+        res = evaluate.retrieval_eval(tuple(int(k) for k in args.k.split(",")), tuple(args.mode.split(",")))
+        print(json.dumps(res, indent=2) if args.json else evaluate.retrieval_table(res))
+        if args.min_recall is not None:
+            m, k = res["modes"].get("hybrid"), max(int(x) for x in args.k.split(","))
+            if not isinstance(m, dict):
+                print("GATE FAIL: hybrid retrieval unavailable", file=sys.stderr)
+                return 1
+            low = [f"{lang}@{k}={m[f'{lang}@{k}']['rate']}" for lang in ("en", "non-en")
+                   if m[f"{lang}@{k}"]["rate"] < args.min_recall]
+            for x in low:
+                print(f"GATE FAIL: hybrid recall {x} < {args.min_recall}", file=sys.stderr)
+            return 1 if low else 0
     elif args.cmd == "smoke":
         return smoke(args.config)
     return 0

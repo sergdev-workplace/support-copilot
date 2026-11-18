@@ -214,18 +214,48 @@ def compare_table() -> str:
     return "\n".join(lines)
 
 
-def retrieval_eval(k: int = 6) -> dict:
-    """Phase 2: does BM25 top-k contain a chunk from an expected page? Per language."""
-    from .retrieval import retrieve
+def retrieval_eval(ks: tuple[int, ...] = (3, 6), modes: tuple[str, ...] | None = None) -> dict:
+    """Phase 2 (ISS-26): does top-k contain a chunk from an expected page? Per mode and language,
+    with 95% Wilson intervals. Misses are listed at the largest k."""
+    from .retrieval import MODES, resolve_mode, retrieve
+    modes = modes or MODES
     rows = [t for t in load_tickets() if "cite_pages" in t["exp"] and "answer" in t["exp"]["mode"]]
-    by_lang: dict[str, list[bool]] = {}
-    misses = []
-    for t in rows:
-        pages = {cid.split("#")[0] for cid in retrieve(t["text"], k)}
-        hit = bool(pages & set(t["exp"]["cite_pages"]))
-        by_lang.setdefault("en" if t["exp"]["language"] == "en" else "non-en", []).append(hit)
-        if not hit:
-            misses.append(t["id"])
-    return {"k": k,
-            "recall_at_k": {l: {"rate": round(sum(v) / len(v), 3), "n": len(v)} for l, v in by_lang.items()},
-            "misses": misses}
+    out: dict = {"n": {"en": sum(t["exp"]["language"] == "en" for t in rows)}, "modes": {}}
+    out["n"]["non-en"] = len(rows) - out["n"]["en"]
+    for mode in modes:
+        if resolve_mode(mode) != mode:
+            out["modes"][mode] = "unavailable (pip install -r requirements-rag.txt)"
+            continue
+        hits: dict[tuple[str, int], list[bool]] = {}
+        misses = []
+        for t in rows:
+            lang = "en" if t["exp"]["language"] == "en" else "non-en"
+            ranked = retrieve(t["text"], max(ks), mode)
+            # Strict: one of the labelled chunks is retrieved. Lenient fallback: one of the pages
+            # (only 4 pages exist, so page recall alone is easy to pass).
+            want = set(t["exp"].get("cite_chunks") or [])
+            for k in ks:
+                got = ranked[:k]
+                hit = bool(want & set(got)) if want else bool(
+                    {c.split("#")[0] for c in got} & set(t["exp"]["cite_pages"]))
+                hits.setdefault((lang, k), []).append(hit)
+                if k == max(ks) and not hit:
+                    misses.append(t["id"])
+        out["modes"][mode] = {
+            f"{lang}@{k}": {"rate": round(sum(v) / len(v), 3), "ci95": wilson(sum(v), len(v))}
+            for (lang, k), v in sorted(hits.items())}
+        out["modes"][mode]["misses"] = misses
+    return out
+
+
+def retrieval_table(r: dict) -> str:
+    cols = [c for c in next((m for m in r["modes"].values() if isinstance(m, dict)), {}) if c != "misses"]
+    lines = [f"chunk recall@k (en n={r['n']['en']}, non-en n={r['n']['non-en']})",
+             "| mode | " + " | ".join(cols) + " | misses |", "|---|" + "---|" * (len(cols) + 1)]
+    for mode, m in r["modes"].items():
+        if not isinstance(m, dict):
+            lines.append(f"| {mode} | {m} |")
+            continue
+        cells = [f"{m[c]['rate']:.0%} ({m[c]['ci95'][0]:.0%}-{m[c]['ci95'][1]:.0%})" for c in cols]
+        lines.append(f"| {mode} | " + " | ".join(cells) + f" | {', '.join(m['misses']) or '-'} |")
+    return "\n".join(lines)

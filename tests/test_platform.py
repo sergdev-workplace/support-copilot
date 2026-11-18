@@ -78,6 +78,60 @@ def test_bm25_skips_copies():
     assert not any(kb.get(c).get("copy_of") for c in retrieve("minimum deposit withdrawal pending rejected", 10))
 
 
+# --- ISS-26: multilingual retrieval ----------------------------------------------------------
+
+class FakeEmbedder:
+    """Concept vectors: the same idea in different languages lands on the same axis."""
+    name = "fake"
+    CONCEPTS = [("withdraw", "вывести", "вывод", "retiro", "سحب"),
+                ("deposit", "депозит", "пополн", "depósito"),
+                ("account", "счёт", "счет", "conta", "akun"),
+                ("verif", "верификац", "verifikasi")]
+
+    def embed(self, texts, kind="passage"):
+        import numpy as np
+        v = np.array([[sum(t.lower().count(w) for w in c) for c in self.CONCEPTS] for t in texts], dtype=np.float32)
+        v += 1e-3  # avoid zero vectors
+        return v / np.linalg.norm(v, axis=1, keepdims=True)
+
+
+@pytest.fixture
+def fake_embedder():
+    from copilot import embeddings
+    embeddings.set_embedder(FakeEmbedder())
+    yield
+    embeddings.set_embedder(None)
+
+
+def test_tokenizer_keeps_non_latin_words():
+    from copilot.retrieval import tokenize
+    assert "вывести" in tokenize("Как вывести деньги?")
+
+
+def test_dense_retrieval_matches_across_languages(fake_embedder):
+    from copilot.retrieval import retrieve
+    assert retrieve("Как вывести деньги?", 6, "bm25") == []      # no shared words with the English KB
+    top = retrieve("Как вывести деньги?", 3, "dense")
+    assert top and all("withdraw" in (c + kb.get(c)["text"]).lower() for c in top)
+    assert retrieve("Как вывести деньги?", 3, "hybrid")[0] == top[0]
+
+
+def test_dense_retrieval_skips_copies(fake_embedder):
+    from copilot.retrieval import retrieve
+    assert not any(kb.get(c).get("copy_of") for c in retrieve("deposit withdraw", 20, "dense"))
+
+
+def test_rrf_rewards_agreement():
+    from copilot.retrieval import rrf
+    assert rrf(["a", "b", "c"], ["b", "c", "a"])[0] == "b"
+
+
+def test_hybrid_falls_back_to_bm25_without_fastembed(monkeypatch):
+    from copilot import embeddings, retrieval
+    monkeypatch.setattr(embeddings, "available", lambda: False)
+    assert retrieval.resolve_mode("hybrid") == "bm25"
+
+
 # --- ISS-20: cascade triggers ----------------------------------------------------------------
 
 def test_cascade_redrafts_core_topic_abstain():

@@ -53,7 +53,8 @@ CONFIGS = {
     "sonnet-noverify": Config("sonnet-noverify", "claude-sonnet-5-5",
                               description="Claude Sonnet 5.5 without verifier (ablation)"),
     "sonnet-rag": Config("sonnet-rag", "claude-sonnet-5-5", verify=True, retrieval_k=6,
-                         description="Phase 2: Sonnet 5.5 with BM25 top-6 retrieval + verifier"),
+                         description="Phase 2: Sonnet 5.5 with hybrid top-6 retrieval (BM25 + local "
+                                     "multilingual embeddings) + verifier"),
 }
 
 

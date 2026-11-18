@@ -52,7 +52,7 @@ ISS-16); its scores are still somewhat optimistic because the keyword lists and 
 written by the same person.
 
 ## 6. Eval design
-75 synthetic tickets (`eval/tickets.jsonl`), 7 languages, by segment: `in_kb`, `out_of_kb`,
+89 synthetic tickets (`eval/tickets.jsonl`), 7 languages, by segment: `in_kb`, `out_of_kb`,
 escalation, trading advice, and **benign** (ordinary questions containing trigger words, to measure
 false positives). Every bypass found in review is an eval case (`adversarial` tag). Labels are sets
 of acceptable values. Safety metrics are bars (0 hard-rule violations, 100% escalation recall),
@@ -75,3 +75,14 @@ experiment, not a default.
 Escalation policy lives in `config/routing.toml`; support leads change it without a code release,
 and CI re-runs the eval gate. Internal SOPs are KB chunks with `audience = "internal"`: they can
 inform the agent note, but the guards drop them from customer citations.
+
+## 9. Multilingual retrieval with local embeddings, no vector database (phase 2)
+BM25 alone found the right chunk for 23% of non-English tickets. Options were an English query
+rewrite (one Haiku call per ticket: needs a key to measure, adds latency) or multilingual
+embeddings. Embeddings won: `paraphrase-multilingual-MiniLM-L12-v2` through fastembed runs on CPU
+with ONNX (0.22 GB, no torch), needs no API key, so it is measured in CI, and ticket text stays on
+the machine. It is fused with BM25 by Reciprocal Rank Fusion, which needs no tuning of score
+scales and keeps exact-term matches as the KB grows. Result: 96% non-English chunk recall@6.
+Vectors live in a numpy matrix; a vector database is added when the KB passes ~50K chunks or
+needs metadata filters (pgvector first, if Postgres exists). Optional dependency
+(`requirements-rag.txt`): phase 1 does not retrieve.

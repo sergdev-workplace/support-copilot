@@ -21,6 +21,15 @@ jobs:
         run: python -m pytest -q
       - name: Safety gate on the no-LLM baseline
         run: python -m copilot eval --config mock --gate
+      - name: Cache the embedding model
+        uses: actions/cache@v4
+        with:
+          path: .cache/fastembed
+          key: fastembed-${{ hashFiles('requirements-rag.txt') }}
+      - name: Multilingual retrieval gate (phase 2, local embeddings, no API key)
+        run: |
+          pip install -r requirements-rag.txt
+          python -m copilot retrieval-eval --min-recall 0.9
       - name: Safety gate on the production config (only when an API key secret is set)
         if: ${{ env.ANTHROPIC_API_KEY != '' }}
         run: |
