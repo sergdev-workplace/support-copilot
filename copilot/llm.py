@@ -25,8 +25,8 @@ PRICING = {
     "claude-haiku-5-5": {"in": 0.10, "out": 0.50, "cache_read": 0.01, "cache_write": 0.20},
     "claude-sonnet-5-5": {"in": 2.00, "out": 10.00, "cache_read": 0.10, "cache_write": 4.00},
     "claude-opus-5-5": {"in": 4.00, "out": 20.00, "cache_read": 0.20, "cache_write": 8.00},
-    # OpenAI: caching is automatic, no write surcharge. Prices from public price trackers
-    # (2026-11-18), to confirm on OpenAI's pricing page. Output includes reasoning tokens.
+    # OpenAI: caching is automatic, no write surcharge. Standard tier, context under 272K tokens,
+    # checked on developers.openai.com/api/docs/pricing (2026-11-19). Output includes reasoning tokens.
     "openai:gpt-5.5": {"in": 5.00, "out": 30.00, "cache_read": 0.50, "cache_write": 5.00},
 }
 VERIFIER_MODEL = "claude-haiku-5-5"
@@ -64,6 +64,9 @@ CONFIGS = {
                       description="OpenAI GPT-5.5, reasoning effort low, + GPT-5.5 verifier"),
     "gpt-5.5-noverify": Config("gpt-5.5-noverify", "openai:gpt-5.5",
                                description="OpenAI GPT-5.5, reasoning effort low, code guards only, no LLM verifier"),
+    "gpt-5.5-rag": Config("gpt-5.5-rag", "openai:gpt-5.5", retrieval_k=6,
+                          description="Phase 2: GPT-5.5 with hybrid top-6 retrieval instead of the whole KB, "
+                                      "code guards only (compare with gpt-5.5-noverify)"),
 }
 
 

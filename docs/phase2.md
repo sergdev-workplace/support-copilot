@@ -13,7 +13,7 @@ What breaks with growth is **knowledge** (KB and SOPs outgrow one prompt and cha
 | Routing/escalation policy as configuration (SOP changes without a release) | `config/routing.toml`, `copilot/router.py` | done, tested |
 | Internal SOPs in the KB, `audience = "internal"`, never cited to customers | `kb/build_kb.py --with-sops`, `kb/sops/`, guard in `postcheck.py` | done (example SOP, off by default) |
 | `copy_of` metadata for duplicated content | `kb/build_kb.py` | done |
-| Hybrid retrieval behind the `kb` seam: BM25 + local multilingual embeddings fused by Reciprocal Rank Fusion; `retrieval_k` config moves chunks from the cached system prompt into the user turn | `copilot/retrieval.py`, `copilot/embeddings.py`, config `sonnet-rag` | done |
+| Hybrid retrieval behind the `kb` seam: BM25 + local multilingual embeddings fused by Reciprocal Rank Fusion; `retrieval_k` config moves chunks from the cached system prompt into the user turn | `copilot/retrieval.py`, `copilot/embeddings.py`, configs `gpt-5.5-rag` (measured end to end) and `sonnet-rag` | done |
 | Retrieval eval: chunk-level recall@k per mode and language, 95% intervals, CI gate | `python -m copilot retrieval-eval [--min-recall 0.9]` | done, see result below |
 | Cascade: Haiku drafts, Sonnet re-drafts doubtful outputs (low confidence, core-topic abstain, or guards would fire) | config `cascade` | done |
 | Eval as a CI regression gate | `.github/workflows/ci.yml`, `eval --gate` | done (mock in CI; LLM configs when an API key secret exists) |
@@ -39,7 +39,28 @@ memory, computed at first use; search is one matrix product. Up to ~50K chunks t
 (~75 MB); beyond that, or when filters by version/audience/language are needed, `DenseIndex` in
 `copilot/embeddings.py` is the one class to swap for pgvector (if Postgres already exists) or Qdrant.
 
-Phase 1 still keeps the whole KB in the prompt: at 29 chunks retrieval only adds a way to fail.
+### End to end: GPT-5.5 with retrieval vs the whole KB (92 tickets, both without the LLM verifier)
+
+| config | usable drafts | violations | escalation recall | false esc. | $/ticket | p50 | cached share of input |
+|---|---|---|---|---|---|---|---|
+| `gpt-5.5-noverify` (whole KB in the prompt) | 96% | 0 | 100% | 0% | $0.0133 | 4.3 s | ~90% |
+| `gpt-5.5-rag` (hybrid top-6) | 95% | 0 | 100% | 0% | $0.0201 | 4.5 s | ~5% |
+
+- **Quality and safety hold.** The one ticket retrieval loses is the predicted T50 (VND): the model
+  did not get the currency chunk and **abstained** instead of guessing. This is the right failure mode:
+  a retrieval miss costs a usable draft, not a hard-rule violation. (M11 fails a citation label that
+  arguably is too narrow; left as is to avoid tuning labels to a config.)
+- **Retrieval is more expensive at this KB size, not cheaper.** The whole KB is ~3.8K tokens and is
+  read from the prompt cache at a tenth of the price; with retrieval the ~1.7K tokens of chunks change
+  per ticket and are paid in full. In this run even the static instructions were rarely cached (117 of
+  ~1.8K tokens on average, although the smoke test cached them); the cause could not be checked because
+  the API credits ran out (ISS-42). Even with perfect caching retrieval would only roughly match the
+  whole-KB cost here.
+- **When to switch:** retrieval pays off when the KB no longer fits comfortably in a cached prompt
+  (hundreds of chunks, SOPs included) or when per-audience filtering is needed, not before.
+
+Phase 1 still keeps the whole KB in the prompt: at 29 chunks retrieval only adds a way to fail,
+and, measured above, costs more.
 
 ## Still to do in phase 2
 

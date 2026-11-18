@@ -1,5 +1,5 @@
 # Business case: support co-pilot
-_Generated 2026-11-18 by `python -m copilot business-case` from `eval/results/*.json` (92 eval tickets). Assumptions at the bottom._
+_Generated 2026-11-19 by `python -m copilot business-case` from `eval/results/*.json` (92 eval tickets). Assumptions at the bottom._
 
 ## Answer
 **Yes, run it with `gpt-5.5-noverify` (OpenAI GPT-5.5, reasoning effort low, code guards only, no LLM verifier).** At 10,000 tickets/month it saves ~319 agent hours (~2.1 FTE, 32% of handling time) worth $3,190/month, against $133 LLM, $0 specialist time on false escalations and $1,600 fixed: **net $1,457/month** (pessimistic, 95% lower bounds: -$71). Break-even ~5,233 tickets/month.
@@ -14,6 +14,7 @@ Rule used: among configurations that pass the safety bar, pick the highest net v
 | config | safety bar | usable drafts | LLM $/mo | false-esc. $/mo | hours saved/mo | net $/mo | net, pessimistic |
 |---|---|---|---|---|---|---|---|
 | gpt-5.5-noverify | pass | 96% | 133 | 0 | 319 | $1,457 | -$71 |
+| gpt-5.5-rag | pass | 95% | 201 | 0 | 311 | $1,312 | -$236 |
 | gpt-5.5 | pass | 96% | 190 | 0 | 319 | $1,400 | -$129 |
 | mock | pass | 56% | 0 | 581 | 98 | -$1,201 | -$3,064 |
 

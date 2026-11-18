@@ -16,7 +16,7 @@ alternatives that were rejected, and what is honestly not done.
 | Never invent policy, fees, timelines | fact grounding (digits, number words, durations, vague time frames, topic match), citation-topic check, verifier | eval: "answered a question the KB does not cover", shipped fact re-check; tests ISS-10/11/13/23 |
 | KB used as is, with gaps and inconsistencies | raw HTML snapshot, `copy_of` marking, `kb_conflicts` in output | `docs/kb_issues.md` |
 | Phase 1: ship ASAP | whole KB in a cached prompt, CLI / batch / web page, shadow → pilot plan | `docs/phase1.md` |
-| Phase 2: ~10K tickets/month, KB and SOPs grow | routing as config, SOPs as internal chunks, hybrid multilingual retrieval, cascade, CI gates, pilot log | `docs/phase2.md` |
+| Phase 2: ~10K tickets/month, KB and SOPs grow | routing as config, SOPs as internal chunks, hybrid multilingual retrieval, cascade, CI gates, pilot log | `docs/phase2.md`; `gpt-5.5-rag` measured: 95% usable, 0 violations, retrieval miss → abstain |
 | Measure it | 92-ticket eval, segments, Wilson intervals, safety gate, no-LLM baseline, verifier ablation | `eval/results/`: gpt-5.5 96% usable, 0 violations, 100% escalation recall; baseline 56% |
 | Business case: worth it at our volume, which configuration | `BUSINESS_CASE.md` generated from eval results | Yes: GPT-5.5 with code guards, net ~$1,460/month at 10K tickets, break-even ~5,200/month; Claude configs not yet measured |
 | Python, any LLM, agentic coding, CLI or web page | Python 3.12, Claude API, Claude Code, CLI + web page | `README.md` |

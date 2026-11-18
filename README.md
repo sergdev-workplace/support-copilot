@@ -62,11 +62,12 @@ python -m copilot business-case                  # regenerates BUSINESS_CASE.md 
 ```
 
 **Measured so far** (92 tickets): `gpt-5.5` and `gpt-5.5-noverify` 96% usable drafts, 0 hard-rule violations,
-100% escalation recall, 0% false escalations, $0.013-0.019/ticket; no-LLM baseline 56%. Claude configs are
+100% escalation recall, 0% false escalations, $0.013-0.019/ticket; no-LLM baseline 56%. Phase 2 `gpt-5.5-rag`
+(hybrid retrieval): 95%, 0 violations, $0.020/ticket (retrieval costs more than the cached whole KB at this size). Claude configs are
 built and tested against a fake API but not yet measured (no Anthropic key in this environment).
 
 Configs (`copilot/llm.py`): `mock` (no LLM) · `gpt-5.5` (OpenAI GPT-5.5, effort low, + GPT-5.5 verifier) ·
-`gpt-5.5-noverify` (code guards only) · `haiku` / `sonnet` / `opus` (Claude 5.5 models at effort
+`gpt-5.5-noverify` (code guards only) · `gpt-5.5-rag` (phase 2: hybrid top-6 retrieval, code guards only) · `haiku` / `sonnet` / `opus` (Claude 5.5 models at effort
 `low`, each with the Haiku verifier) · `cascade` (Haiku, Sonnet re-drafts doubtful outputs) ·
 `sonnet-noverify` (ablation: what the verifier adds) · `sonnet-rag` (phase 2: hybrid BM25 + multilingual-embedding top-6 instead of the
 whole KB). A full eval run is 92 tickets × up to 2 calls: ~$1.80 on GPT-5.5, well under $1 on Claude Haiku/Sonnet.
