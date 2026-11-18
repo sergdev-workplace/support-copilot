@@ -39,13 +39,14 @@ ticket ─► prefilter.py   strong flags act (advice, complaint, KYC decision, 
 ```bash
 pip install -r requirements.txt
 python kb/build_kb.py              # chunks from kb/raw snapshots (--fetch re-downloads, --with-sops adds SOPs)
-python -m pytest -q                # 54 tests: guards, routing, retrieval, API request shape; no API key
+python -m pytest -q                # 59 tests: guards, routing, retrieval, pilot log, API request shape; no API key
 
 # offline, no API key: rules + lexical-search baseline
 python -m copilot triage --config mock --text "Can you approve my KYC manually?"
 python -m copilot eval --config mock --gate
 python -m copilot batch --in eval/sample_queue.csv --out out/queue --config mock
-python -m copilot serve --config mock            # http://127.0.0.1:8000
+python -m copilot serve --config mock            # http://127.0.0.1:8000 (feedback buttons for the pilot)
+python -m copilot pilot-report                   # traffic mix + sent/edited/discarded per segment from out/pilot_log.jsonl
 pip install -r requirements-rag.txt   # phase-2 retrieval: local multilingual embeddings (0.22 GB model)
 python -m copilot retrieval-eval    # chunk recall@k: bm25 vs dense vs hybrid, English vs other languages
 
@@ -65,13 +66,13 @@ whole KB). A full eval run is 89 tickets × 2 calls; at list prices well under $
 
 ```
 copilot/   pipeline.py prefilter.py llm.py prompt.py postcheck.py verifier.py router.py templates.py
-           retrieval.py embeddings.py kb.py schema.py evaluate.py business_case.py web.py __main__.py (CLI)
+           retrieval.py embeddings.py audit.py kb.py schema.py evaluate.py business_case.py web.py __main__.py (CLI)
 config/    routing.toml (escalation rules = SOP as configuration)
 kb/        build_kb.py · raw/ (HTML snapshots, fetched 2026-11-16) · pages/ (readable) · chunks.jsonl (29 chunks,
            9 marked copy_of) · sops/ (example internal SOP, off by default)
 eval/      tickets.jsonl (89 labelled tickets, 7 languages, incl. benign and adversarial; chunk labels for retrieval) · results/<config>.json
            · sample_queue.csv
-tests/     test_guards.py (hard rules, one test per issue) · test_platform.py (routing, retrieval, batch, API path)
+tests/     test_guards.py (hard rules, one test per issue) · test_platform.py (routing, retrieval, batch, API path) · test_pilot_log.py
 .github/   workflows/ci.yml (tests + safety gate)
 ```
 

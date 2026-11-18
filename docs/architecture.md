@@ -45,6 +45,12 @@ sources (or "the KB doesn't cover this"), and the queue it belongs in. The agent
 
 If the API fails or refuses, the ticket goes to `agent_answer` with the reason. Nothing is dropped.
 
+**Audit and pilot log** (`copilot/audit.py` → `out/pilot_log.jsonl`): every result from `triage`,
+`batch` and `serve` is appended with what produced it (config, model, prompt hash, KB hash and
+fetch date, routing-file hash, guard actions). The web page records what the agent did with the
+draft (sent as is / edited / discarded, route wrong). `python -m copilot pilot-report` turns the log
+into the real traffic mix and acceptance per segment, which replace the business-case assumptions.
+
 ## Components
 
 | Part | Files | Phase |
@@ -55,6 +61,7 @@ If the API fails or refuses, the ticket goes to `agent_answer` with the reason. 
 | Routing policy | `router.py`, `config/routing.toml` | 1 (edited by support leads in 2) |
 | Retrieval | `retrieval.py` (BM25 + RRF), `embeddings.py` (local multilingual model) | 2, opt-in `sonnet-rag` |
 | Interfaces | `__main__.py` (`triage`, `batch`, `serve`, `smoke`), `web.py` | 1 |
+| Audit and pilot log | `audit.py`, `pilot-report` | 1 |
 | Measurement | `evaluate.py` (eval, gate, retrieval eval), `eval/tickets.jsonl`, `business_case.py` | 1 and 2 |
 | CI | `.github/workflows/ci.yml`: tests, safety gate, retrieval gate | 2 (runs from day 1) |
 

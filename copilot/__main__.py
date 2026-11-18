@@ -8,6 +8,9 @@
   python -m copilot business-case
   python -m copilot retrieval-eval [--k 3,6] [--mode bm25,dense,hybrid]
   python -m copilot smoke [--config haiku]                      # 2 real API calls: schema, beta, cache
+  python -m copilot pilot-report [--log out/pilot_log.jsonl]    # acceptance + traffic mix from the pilot log
+
+triage, batch and serve append every result to the audit/pilot log (copilot/audit.py; COPILOT_LOG="" disables).
 """
 from __future__ import annotations
 
@@ -67,6 +70,9 @@ def batch(inp: Path, out_prefix: Path, config: str, workers: int) -> None:
     cp = Copilot(config)
     with ThreadPoolExecutor(max_workers=1 if cp.config.model is None else workers) as ex:
         results = list(ex.map(lambda t: cp.triage(t["text"], t["id"]), queue))
+    from . import audit
+    for t, r in zip(queue, results):  # shadow mode: logged for the traffic mix and the audit trail
+        audit.log_result(r, t["text"], "batch")
     out_prefix.parent.mkdir(parents=True, exist_ok=True)
     jl = out_prefix.with_suffix(".jsonl")
     jl.write_text("\n".join(json.dumps(r.model_dump(), ensure_ascii=False) for r in results) + "\n", encoding="utf-8")
@@ -148,6 +154,9 @@ def main(argv=None) -> int:
     r.add_argument("--json", action="store_true")
     r.add_argument("--min-recall", type=float, help="CI gate: exit 1 if hybrid recall at the largest k "
                                                     "is below this for English or non-English tickets")
+    pr = sub.add_parser("pilot-report", help="acceptance per segment and traffic mix from the pilot log")
+    pr.add_argument("--log", help="path to the log (default: COPILOT_LOG or out/pilot_log.jsonl)")
+    pr.add_argument("--json", action="store_true")
     sm = sub.add_parser("smoke", help="2 real API calls to check the integration")
     sm.add_argument("--config", default="haiku", choices=list(CONFIGS))
 
@@ -157,6 +166,8 @@ def main(argv=None) -> int:
         from .pipeline import Copilot
         text = args.text if args.text else (open(args.file, encoding="utf-8").read() if args.file else sys.stdin.read())
         res = Copilot(args.config).triage(text.strip(), "cli")
+        from . import audit
+        audit.log_result(res, text.strip(), "cli")
         print(json.dumps(res.model_dump(), ensure_ascii=False, indent=2) if args.json else format_result(res))
     elif args.cmd == "batch":
         batch(Path(args.inp), Path(args.out), args.config, args.workers)
@@ -193,6 +204,10 @@ def main(argv=None) -> int:
             for x in low:
                 print(f"GATE FAIL: hybrid recall {x} < {args.min_recall}", file=sys.stderr)
             return 1 if low else 0
+    elif args.cmd == "pilot-report":
+        from . import audit
+        rep = audit.report(Path(args.log) if args.log else None)
+        print(json.dumps(rep, indent=2) if args.json else audit.report_table(rep))
     elif args.cmd == "smoke":
         return smoke(args.config)
     return 0
