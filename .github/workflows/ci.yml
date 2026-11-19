@@ -11,8 +11,8 @@ jobs:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
@@ -23,7 +23,7 @@ jobs:
       - name: Safety gate on the no-LLM baseline
         run: python -m copilot eval --config mock --gate
       - name: Cache the embedding model
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .cache/fastembed
           key: fastembed-${{ hashFiles('requirements-rag.txt') }}
