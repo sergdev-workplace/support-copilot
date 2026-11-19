@@ -69,6 +69,12 @@ def route(out: LLMOutput, pf: PrefilterFlags) -> tuple[str, str | None, list[str
     if hits:
         queue = min((r["queue"] for r in hits), key=cfg["queue_priority"].index)
         return "escalate", queue, reasons
+    if out.answer_mode == "holding_reply":
+        # The guard/verifier may discover an outcome even when ticket signals missed it.
+        queue = {"verification": "kyc_team", "complaint": "complaints",
+                 "aml_compliance": "compliance"}.get(out.classification.category, "senior_support")
+        reasons.append("holding reply requires specialist review")
+        return "escalate", queue, reasons
     if out.answer_mode == "abstain":
         reasons.append("knowledge base does not cover the question")
         return "agent_answer", None, reasons

@@ -31,15 +31,19 @@ ADVICE_IN_DRAFT = [
 ]
 DECISION_IN_DRAFT = [
     r"\b(your (account|verification|kyc|documents?|withdrawal) (has|have) been|we have) (approved|verified|rejected|declined|unblocked|unfrozen)\b",
+    r"\byour (account|verification|kyc|documents?|withdrawal) (is|are) (now )?(approved|verified|rejected|declined|unblocked|unfrozen)\b",
     r"\bwe (will|'ll|shall|can) (refund|compensate|reimburse|credit you|approve|reject|unblock|unfreeze)\b",
     r"\b(you will|you'll) (receive|get) (a |your |full )?(refund|compensation|money back)\b",
-    r"\b(your )?complaint (is|has been|will be) (upheld|rejected|accepted|resolved in your favou?r)\b",
+    r"\b(your )?complaint (is|has been|will be) (upheld|rejected|accepted|dismissed|denied|resolved in your favou?r)\b",
+    r"(мы )?(вернём|вернем|компенсируем|одобрим|одобрили|отклонили)",
+]
+DECISION_TIMELINE_IN_DRAFT = [
     r"\b(will be|is going to be) (resolved|decided|approved|refunded|completed) (by|before|within|on)\b",
     r"\b(by|before|until) (monday|tuesday|wednesday|thursday|friday|saturday|sunday|tomorrow|next week|the end of)\b",
-    r"(мы )?(вернём|вернем|компенсируем|одобрим|одобрили|отклонили)",
 ]
 _ADVICE = [re.compile(p, re.IGNORECASE) for p in ADVICE_IN_DRAFT]
 _DECISION = [re.compile(p, re.IGNORECASE) for p in DECISION_IN_DRAFT]
+_DECISION_TIMELINE = [re.compile(p, re.IGNORECASE) for p in DECISION_TIMELINE_IN_DRAFT]
 
 # English templates under their old names (used by tests and the evaluator).
 HOLDING_TEMPLATE = templates.TEMPLATES["en"]["holding"]
@@ -51,8 +55,9 @@ def has_advice(*texts: str) -> bool:
     return any(p.search(t) for t in texts if t for p in _ADVICE)
 
 
-def has_decision(*texts: str) -> bool:
-    return any(p.search(t) for t in texts if t for p in _DECISION)
+def has_decision(*texts: str, include_timelines: bool = True) -> bool:
+    patterns = _DECISION + (_DECISION_TIMELINE if include_timelines else [])
+    return any(p.search(t) for t in texts if t for p in patterns)
 
 
 # ---------------------------------------------------------------- facts (numbers, durations)
@@ -242,16 +247,19 @@ def check(out: LLMOutput, ticket_text: str, holding_required: bool) -> tuple[LLM
             else:
                 replace_with_template(out, "abstain", "abstain", actions)
 
-    # 5. Complaint / KYC / AML / account compromise: never state an outcome or a resolution date.
-    if holding_required:
-        if has_decision(out.draft_reply, out.draft_reply_en):
-            actions.append("draft stated a complaint/KYC/AML outcome or date -> holding template")
-            replace_with_template(out, "holding", "holding_reply", actions)
-        if out.answer_mode in ("answer", "abstain"):
-            if is_template():
-                replace_with_template(out, "holding", "holding_reply", actions)
-            out.answer_mode = "holding_reply"
-            actions.append("answer_mode forced to holding_reply (specialist decision needed)")
+    # 5. Outcome detection must not depend on the model's classification or the pre-filter.
+    if has_decision(out.draft_reply, out.draft_reply_en,
+                    include_timelines=holding_required or out.answer_mode == "holding_reply"):
+        actions.append("draft stated a complaint/KYC/AML outcome or date -> holding template")
+        replace_with_template(out, "holding", "holding_reply", actions)
+
+    # Specialist cases use fixed acknowledgements: regexes cannot cover every way of deciding
+    # a case (for example, "we found against you"). Never retain a free-form holding reply.
+    if holding_required or out.answer_mode == "holding_reply":
+        holding_text, _ = templates.get("holding", out.classification.language)
+        if out.answer_mode != "holding_reply" or out.draft_reply != holding_text:
+            actions.append("specialist decision needed -> holding template")
+        replace_with_template(out, "holding", "holding_reply", actions)
 
     if not out.draft_reply.strip():
         kind = {"decline_trading_advice": "decline", "holding_reply": "holding"}.get(out.answer_mode, "abstain")

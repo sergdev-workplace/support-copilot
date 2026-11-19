@@ -1,6 +1,8 @@
 """The hard rules are enforced by code; these tests pin that behaviour down without calling any
 LLM. Fake backends return deliberately bad outputs and the pipeline must still produce something
 safe. Test names reference the issues log (docs/issues_log.md)."""
+import pytest
+
 from copilot import postcheck, prefilter, router, templates
 from copilot.llm import Config
 from copilot.pipeline import Copilot
@@ -217,6 +219,42 @@ def test_iss17_weak_signal_does_not_change_route():
 
 # --- rule 2: never decide complaint / KYC / AML -----------------------------------------
 
+@pytest.mark.parametrize("draft", ["Your complaint is dismissed.", "We found against you."])
+def test_specialist_case_never_retains_a_free_form_outcome(draft):
+    r = triage_with(out(classification=cls("complaint"), draft_reply=draft),
+                    "I want to file a formal complaint.")
+    assert r.draft_reply == postcheck.HOLDING_TEMPLATE
+    assert r.answer_mode == "holding_reply"
+    assert (r.route, r.queue) == ("escalate", "complaints")
+
+
+@pytest.mark.parametrize("mode", ["answer", "abstain", "decline_trading_advice", "holding_reply"])
+@pytest.mark.parametrize("draft", ["Your account has been approved.", "Your account is now verified."])
+def test_kyc_outcome_blocked_without_ticket_decision_signals(mode, draft):
+    r = triage_with(out(classification=cls("verification"), answer_mode=mode,
+                        citations=["verify#steps"], draft_reply=draft),
+                    "How do I verify my account?")
+    assert r.draft_reply == postcheck.HOLDING_TEMPLATE
+    assert r.answer_mode == "holding_reply"
+    assert (r.route, r.queue) == ("escalate", "kyc_team")
+    assert not r.citations
+
+
+def test_outcome_with_wrong_category_still_gets_specialist_review():
+    r = triage_with(out(draft_reply="Your account has been approved."), "Hello")
+    assert r.draft_reply == postcheck.HOLDING_TEMPLATE
+    assert (r.route, r.queue) == ("escalate", "senior_support")
+
+
+def test_general_verification_timeline_still_allowed():
+    draft = "Account opening and document verification will be completed within 48 hours."
+    r = triage_with(out(classification=cls("verification"), draft_reply=draft,
+                        citations=["open_account#how-long-does-it-take-to-open-an-account"]),
+                    "How long does verification take?")
+    assert r.answer_mode == "answer" and r.draft_reply == draft
+    assert r.route == "agent_review"
+
+
 def test_kyc_decision_is_escalated_even_if_model_misses_it():
     model_says = out(classification=cls("verification"), draft_reply="Your account has been approved.", citations=[])
     r = triage_with(model_says, "Can you approve my KYC manually please?")
@@ -249,12 +287,22 @@ def test_iss05_security_incident_gets_holding_reply():
     assert r.route == "escalate" and r.answer_mode == "holding_reply"
 
 
-def test_verifier_outcome_finding_forces_holding_template():
+def test_specialist_outcome_is_replaced_before_verifier():
     sneaky = out(classification=cls("complaint", "high", "en", "angry"), answer_mode="holding_reply", citations=[],
                  draft_reply="Good news is on the way, your case looks fine to us.")
     v = FakeVerifier(Verdict(unsupported_statements=[], gives_trading_advice=False, states_outcome=True, reason="implies outcome"))
     r = triage_with(sneaky, "I filed a formal complaint", verifier=v)
+    assert r.draft_reply == postcheck.HOLDING_TEMPLATE and r.verified is None
+
+
+def test_verifier_outcome_finding_without_ticket_signals_escalates():
+    sneaky = out(classification=cls("verification"), citations=["verify#steps"],
+                 draft_reply="Good news is on the way, your case looks fine to us.")
+    v = FakeVerifier(Verdict(unsupported_statements=[], gives_trading_advice=False,
+                             states_outcome=True, reason="implies outcome"))
+    r = triage_with(sneaky, "How do I verify my account?", verifier=v)
     assert r.draft_reply == postcheck.HOLDING_TEMPLATE and r.verified is False
+    assert (r.route, r.queue) == ("escalate", "kyc_team")
 
 
 def test_verifier_unsupported_statement_forces_abstain():
