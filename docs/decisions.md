@@ -8,7 +8,9 @@ index, chunk tuning and a new failure mode (the right chunk not retrieved) for n
 KB goes into a byte-stable system prompt with a **1-hour prompt cache**: at ~14 tickets/hour a
 5-minute cache would expire between tickets; the 1-hour write costs 2x input but is re-used dozens
 of times. The minimum cacheable prefix on the Claude 5.5 models is 512 tokens, so this prompt does
-cache; `cache_hit_share` in the eval and `python -m copilot smoke` show it.
+cache; `cache_hit_share` in the eval and `python -m copilot smoke` show it. On OpenAI caching is
+automatic for a stable prefix (`prompt_cache_key` keeps requests together): measured ~90% of the
+drafting call's input tokens read from cache on GPT-5.5.
 
 Classification, draft, its English rendering, citations and routing hints come back as **one
 structured output** (`client.beta.messages.parse` with a Pydantic schema), so the result is always
@@ -22,7 +24,7 @@ The prompt states the rules. What reaches the agent passes four more layers:
 |---|---|---|
 | Pre-filter (regex, 7 languages) | `copilot/prefilter.py` | **Strong** signals (explicit advice request, formal complaint, KYC approval request, AML, account compromise, injection) act independently of the model. **Weak** signals (refund, scam, signal, unauthorized) only add a "check" note: OR-ing every keyword flooded specialist queues (ISS-17). |
 | Pattern guards | `copilot/postcheck.py` | Run on **every** answer mode and on both the customer-language draft and the model's English rendering (ISS-11, ISS-12). Advice-like draft → decline template. Citations must exist and be customer-facing. The cited chunks must be about what was asked (ISS-23). **Every fact** (digits, numbers in words, durations normalised to minutes, vague time frames like "a few days") must be in the ticket or a cited chunk **on the same topic**, else abstain/holding (ISS-10, ISS-13, ISS-18). KYC/complaint/AML drafts that state an outcome or date → holding template. An explicit advice request the model answered → decline. |
-| LLM verifier | `copilot/verifier.py` | A Haiku 5.5 call reads the draft next to its cited chunks: unsupported statements, advice in any phrasing or language, implied outcomes. Patterns can't see meaning; the verifier can. ~$0.0003/ticket. If it fails, the draft is shown as "not double-checked". |
+| LLM verifier (optional) | `copilot/verifier.py` | A second call (Haiku 5.5 or GPT-5.5) reads the draft next to its cited chunks: unsupported statements, advice in any phrasing or language, implied outcomes. Patterns can't see meaning; the verifier can. If it fails, the draft is shown as "not double-checked"; if it rejects, the answer mode is kept (a decline stays a decline, ISS-38). Measured on GPT-5.5 it caught nothing the code guards missed and added 3 false abstains (ISS-41), so the recommended config runs without it and the pilot keeps it on as insurance. |
 | Router | `copilot/router.py` + `config/routing.toml` | Declarative rules: escalate if the model's labels **or** a strong pre-filter flag match. Queue priority compliance > KYC > complaints > senior. `holding = true` rules force a holding reply. |
 
 Safe replies are localized templates for the 7 eval languages (ISS-19). Every draft is reviewed by
@@ -69,7 +71,8 @@ LLM spend at 10K tickets/month is ~$10-$215/month depending on the model, agains
 dollars of agent time and, as the mock shows, hundreds of dollars of specialist time on false
 escalations. Rule: among configurations that pass the safety bar, take the highest net value.
 Effort is `low` for all models (classification and short drafting); raising it is a measured
-experiment, not a default.
+experiment, not a default. Measured result: GPT-5.5 with code guards (`gpt-5.5-noverify`) is chosen;
+the verifier and retrieval variants reach the same safety and quality at higher cost (ISS-41, ISS-42).
 
 ## 8. SOPs and routing as configuration (phase 2)
 Escalation policy lives in `config/routing.toml`; support leads change it without a code release,

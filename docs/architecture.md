@@ -66,7 +66,7 @@ into the real traffic mix and acceptance per segment, which replace the business
 | Hard-rule enforcement | `prefilter.py`, `postcheck.py`, `templates.py`, `verifier.py` | 1 |
 | Personal-data masking | `pii.py` (before any external call, restored for the agent) | 1 |
 | Routing policy | `router.py`, `config/routing.toml` | 1 (edited by support leads in 2) |
-| Retrieval | `retrieval.py` (BM25 + RRF), `embeddings.py` (local multilingual model) | 2, opt-in `sonnet-rag` |
+| Retrieval | `retrieval.py` (BM25 + RRF), `embeddings.py` (local multilingual model) | 2, opt-in `gpt-5.5-rag` / `sonnet-rag` |
 | Interfaces | `__main__.py` (`triage`, `batch`, `serve`, `smoke`), `web.py` | 1 |
 | Audit and pilot log | `audit.py`, `pilot-report` | 1 |
 | Measurement | `evaluate.py` (eval, gate, retrieval eval), `eval/tickets.jsonl`, `business_case.py` | 1 and 2 |
@@ -78,7 +78,7 @@ into the real traffic mix and acceptance per segment, which replace the business
 |---|---|---|
 | Goal | Agents use it on real tickets in ~2 weeks, zero customer risk | Same quality while knowledge, volume and the number of people involved grow |
 | Knowledge | Whole KB (29 chunks) in a cached prompt; no retrieval | Hybrid retrieval (BM25 + multilingual embeddings); ingestion with versions; SOPs as `internal` chunks |
-| Model | One configuration chosen by eval (e.g. Sonnet + Haiku verifier) | Cascade Haiku → Sonnet; Batch API for queues without SLA |
+| Model | One configuration chosen by eval (measured: GPT-5.5 + code guards; verifier on during the pilot) | Cascade Haiku → Sonnet; Batch API for queues without SLA |
 | Rules | Code guards + verifier + routing file | Same; routing file owned by support leads, every change re-runs the CI gate |
 | Agent interface | Web page / batch CSV, copy-paste | Helpdesk integration: private note, tags, queue |
 | Data | Public KB only | Read-only account lookups ("where is my withdrawal #123") |
@@ -92,8 +92,8 @@ opt-in configs, so phase 1 ships without them.
 ## Why this shape
 
 - **Hard rules in code, not only in the prompt.** A prompt is a request; a guard is a guarantee.
-  Each hard rule has two independent checks (pattern guard + verifier) and the router can escalate
-  on the pre-filter alone.
+  Each hard rule is checked before the model (pre-filter) and after it (pattern guards), the router can
+  escalate on the pre-filter alone, and an optional LLM verifier adds a semantic check.
 - **One call, not a chain.** Classification and drafting share the KB context; one structured
   output is cheaper and always valid JSON.
 - **Whole KB in the prompt for phase 1.** At 29 chunks retrieval only adds a failure mode; the

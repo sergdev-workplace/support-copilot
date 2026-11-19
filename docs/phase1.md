@@ -7,8 +7,8 @@ The co-pilot never sends anything; an agent reviews every draft.
 
 | In phase 1 | Cut until phase 2, and why it's safe to cut |
 |---|---|
-| One Claude call per ticket, whole KB (29 chunks, ~3.5K tokens) in a 1-hour cached prompt | Retrieval: the KB fits in one prompt; retrieval adds a failure mode for no gain at this size |
-| Code guards (pre-filter, fact check, topic check, advice/decision checks) + Haiku verifier | Calibrated LLM judge, online drift monitoring: covered by agent review + weekly eval |
+| One LLM call per ticket, whole KB (29 chunks, ~3.5K tokens) in a cached prompt | Retrieval: the KB fits in one prompt; retrieval adds a failure mode for no gain at this size |
+| Code guards (pre-filter, fact check, topic check, advice/decision checks) + optional LLM verifier (on during shadow and pilot) | Calibrated LLM judge, online drift monitoring: covered by agent review + weekly eval |
 | Routing rules in `config/routing.toml` | Helpdesk-native routing: agents move tickets by hand from the suggested queue |
 | CLI (`triage`, `batch`) and a one-page web UI (`serve`) | Helpdesk sidebar app / webhook: agents copy-paste the draft for two weeks |
 | Localized templates for 7 languages | Other languages: English template + "translate" note to the agent |

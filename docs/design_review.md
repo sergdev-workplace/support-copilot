@@ -27,7 +27,7 @@ alternatives that were rejected, and what is honestly not done.
 |---|---|---|
 | Hard rules enforced in code around the model (pre-filter, guards, verifier, router) | Prompt-only rules | A prompt is a request, a guard is a guarantee; each rule has two independent checks and the router can escalate on the pre-filter alone. |
 | One structured call: classify + draft + citations | Classify, then retrieve, then draft (chain) | One call is cheaper and faster; the model sees the KB while classifying, so it knows what is answerable; output is always valid JSON. |
-| Whole KB in a 1-hour cached prompt (phase 1) | RAG from day 1 | 29 chunks fit easily; retrieval only adds a failure mode. RAG is built and measured for phase 2. |
+| Whole KB in a cached prompt (phase 1) | RAG from day 1 | 29 chunks fit easily; retrieval only adds a failure mode and, measured, costs more ($0.020 vs $0.013/ticket). RAG is built and measured for phase 2. |
 | Own citation ids + code verification | Built-in Citations API | Incompatible with structured outputs; own ids make citations testable. |
 | Abstain and holding reply as first-class outputs | Always draft something | This KB lacks fees, limits, methods, withdrawal times; saying "unknown" is the correct answer. |
 | LLM verifier as a second opinion | Patterns only / LLM judge only | Patterns are exact for numbers and citations but blind to meaning; the verifier is the reverse. `sonnet-noverify` measures what the verifier adds. |

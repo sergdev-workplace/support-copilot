@@ -3,7 +3,22 @@
 Classifies incoming support tickets (category, urgency, language, sentiment), drafts a reply grounded
 in the four Valetax help pages with citations, or abstains, and routes to a human specialist when
 needed. Trading advice, complaint/KYC/AML decisions and invented policy are blocked by **code-level
-guards and a verifier**, not only by the prompt.
+guards** (plus an optional LLM verifier), not only by the prompt.
+
+## Results (92 labelled tickets, 7 languages)
+
+| Config | Usable drafts | Hard-rule violations | Escalation recall | False escalations | $/ticket | p50 |
+|---|---|---|---|---|---|---|
+| **`gpt-5.5-noverify`** (recommended: GPT-5.5 + code guards) | 96% | 0 | 100% | 0% | $0.013 | 4.3 s |
+| `gpt-5.5` (+ GPT-5.5 verifier) | 96% | 0 | 100% | 0% | $0.019 | 5.8 s |
+| `gpt-5.5-rag` (phase 2: hybrid retrieval top-6) | 95% | 0 | 100% | 0% | $0.020 | 4.5 s |
+| `mock` (no LLM: rules + lexical search) | 56% | 0 | 100% | 4% | $0 | – |
+
+Business case: **yes, run `gpt-5.5-noverify`**: ~319 agent hours/month saved at 10K tickets, net ~$1,460/month,
+break-even ~5,200 tickets/month ([`BUSINESS_CASE.md`](BUSINESS_CASE.md)). The first real run scored 84% and failed
+the safety gate; what it exposed and how it was fixed is ISS-38..41 in [`docs/issues_log.md`](docs/issues_log.md).
+The guards were fixed on these same tickets, so the numbers are optimistic until the shadow week on real tickets.
+Claude configs are built and tested against a fake API but not measured (no Anthropic key was available).
 
 | Read | What |
 |---|---|
@@ -13,7 +28,7 @@ guards and a verifier**, not only by the prompt.
 | [`docs/phase1.md`](docs/phase1.md) | Ship ASAP: what is cut, shadow → pilot → rollout, how agents use it |
 | [`docs/phase2.md`](docs/phase2.md) | Scale: what is implemented (routing config, SOPs, retrieval, cascade, CI) and what is next |
 | [`docs/decisions.md`](docs/decisions.md) | Design decisions in detail |
-| [`docs/llm_providers.md`](docs/llm_providers.md) | Plan: OpenAI, DeepSeek, Gemini and local models behind the same guards |
+| [`docs/llm_providers.md`](docs/llm_providers.md) | Providers: Claude and OpenAI implemented; DeepSeek, Gemini and local models planned behind the same guards |
 | [`docs/kb_issues.md`](docs/kb_issues.md) | Gaps, copies and contradictions in the knowledge base, and how each is handled |
 | [`docs/issues_log.md`](docs/issues_log.md) | Every problem found in this solution, how it was found, and how it was fixed |
 
@@ -23,13 +38,14 @@ guards and a verifier**, not only by the prompt.
 ticket ─► prefilter.py   strong flags act (advice, complaint, KYC decision, AML, compromise, injection);
                          weak flags (refund, scam, signal...) only add a "check" note
        ─► pii.py         personal data → [CARD_1], [EMAIL_1]... before any external LLM call; restored at the end
-       ─► llm.py         one Claude call, KB in a 1-hour cached prompt → structured JSON: classification,
+       ─► llm.py         one LLM call (Claude or OpenAI GPT-5.5), KB in a cached prompt → structured JSON: classification,
                          answer_mode, draft (+ English rendering), citations, claims, unknowns, kb_conflicts
        ─► [cascade]      optional: cheap model first, stronger model re-drafts doubtful outputs
        ─► postcheck.py   on every mode and both languages: advice → decline · citations exist, customer-facing,
                          on the asked topic · every fact (numbers, words, durations) grounded in the ticket or a
                          same-topic cited chunk · no complaint/KYC/AML outcome or date → localized templates
-       ─► verifier.py    Haiku reads draft + cited chunks: unsupported statements, advice, implied outcomes
+       ─► verifier.py    optional second call (Haiku or GPT-5.5) reads draft + cited chunks: unsupported
+                         statements, advice, implied outcomes
        ─► router.py      rules from config/routing.toml → agent_review | agent_answer |
                          escalate → compliance / kyc_team / complaints / senior_support
 ```
@@ -61,11 +77,6 @@ python -m copilot rescore --config gpt-5.5       # re-score stored outputs after
 python -m copilot business-case                  # regenerates BUSINESS_CASE.md from eval results
 ```
 
-**Measured so far** (92 tickets): `gpt-5.5` and `gpt-5.5-noverify` 96% usable drafts, 0 hard-rule violations,
-100% escalation recall, 0% false escalations, $0.013-0.019/ticket; no-LLM baseline 56%. Phase 2 `gpt-5.5-rag`
-(hybrid retrieval): 95%, 0 violations, $0.020/ticket (retrieval costs more than the cached whole KB at this size). Claude configs are
-built and tested against a fake API but not yet measured (no Anthropic key in this environment).
-
 Configs (`copilot/llm.py`): `mock` (no LLM) · `gpt-5.5` (OpenAI GPT-5.5, effort low, + GPT-5.5 verifier) ·
 `gpt-5.5-noverify` (code guards only) · `gpt-5.5-rag` (phase 2: hybrid top-6 retrieval, code guards only) · `haiku` / `sonnet` / `opus` (Claude 5.5 models at effort
 `low`, each with the Haiku verifier) · `cascade` (Haiku, Sonnet re-drafts doubtful outputs) ·
@@ -75,15 +86,17 @@ whole KB). A full eval run is 92 tickets × up to 2 calls: ~$1.80 on GPT-5.5, we
 ## Repository
 
 ```
-copilot/   pipeline.py prefilter.py llm.py prompt.py postcheck.py verifier.py router.py templates.py
-           retrieval.py embeddings.py audit.py pii.py kb.py schema.py evaluate.py business_case.py web.py __main__.py (CLI)
+copilot/   pipeline.py prefilter.py pii.py llm.py (Claude) openai_backend.py prompt.py postcheck.py verifier.py
+           router.py templates.py retrieval.py embeddings.py audit.py kb.py schema.py evaluate.py business_case.py
+           web.py __main__.py (CLI)
 config/    routing.toml (escalation rules = SOP as configuration)
 kb/        build_kb.py · raw/ (HTML snapshots, fetched 2026-11-16) · pages/ (readable) · chunks.jsonl (29 chunks,
            9 marked copy_of) · sops/ (example internal SOP, off by default)
 eval/      tickets.jsonl (92 labelled tickets, 7 languages, incl. benign, adversarial and personal-data; chunk labels for retrieval) · results/<config>.json
            · sample_queue.csv
-tests/     test_guards.py (hard rules, one test per issue) · test_platform.py (routing, retrieval, batch, API path) · test_pilot_log.py
-.github/   workflows/ci.yml (tests + safety gate)
+tests/     test_guards.py (hard rules, one test per issue) · test_platform.py (routing, retrieval, batch, Claude API path)
+           · test_openai_backend.py · test_pii.py · test_pilot_log.py
+.github/   workflows/ci.yml (tests, safety gate on the baseline, retrieval gate; LLM gates when key secrets are set)
 ```
 
 ## What is mocked or simplified, and what the real version does
@@ -102,9 +115,9 @@ Built with Claude Code (agentic coding).
 
 - **Core (round R1, the assignment's scope):** KB snapshot and chunking, one-call pipeline, hard-rule guards,
   router, eval with a no-LLM baseline, business case, CLI.
-- **Hardening rounds (R2-R6, beyond the timebox):** probes against the guards and a requirement-by-requirement
+- **Hardening rounds (R2-R7, beyond the timebox):** probes against the guards and a requirement-by-requirement
   check (R2-R3), multilingual retrieval (R4), pilot feedback and audit log (R5), personal-data masking and a
-  design review (R6).
+  design review (R6), OpenAI backend and the first real LLM evaluation (R7).
 
 Every defect found by tests, eval or review is recorded with its round, fix and covering test in
 [`docs/issues_log.md`](docs/issues_log.md).
