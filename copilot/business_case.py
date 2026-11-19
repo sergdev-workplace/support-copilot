@@ -190,5 +190,5 @@ def render(a: dict = ASSUMPTIONS) -> str:
 
 
 def write(path: Path = ROOT / "BUSINESS_CASE.md") -> Path:
-    path.write_text(render(), encoding="utf-8")
+    path.write_text(render(), encoding="utf-8", newline="\n")
     return path

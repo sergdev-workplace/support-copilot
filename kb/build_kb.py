@@ -148,12 +148,12 @@ def build(with_sops: bool = False) -> None:
         md = [f"# {chunks[0]['page_title'] if chunks else key}", f"Source: {url} (snapshot {fetched})", ""]
         for c in chunks:
             md += [f"## [{c['id']}] {c['heading']}", c["text"].strip(), ""]
-        (ROOT / "pages" / f"{key}.md").write_text("\n".join(md), encoding="utf-8")
+        (ROOT / "pages" / f"{key}.md").write_text("\n".join(md), encoding="utf-8", newline="\n")
         all_chunks += chunks
     if with_sops:
         all_chunks += extract_sops()
     copies = mark_copies(all_chunks)
-    with open(ROOT / "chunks.jsonl", "w", encoding="utf-8") as f:
+    with open(ROOT / "chunks.jsonl", "w", encoding="utf-8", newline="\n") as f:  # LF on every OS: no git churn
         for c in all_chunks:
             c["snapshot_date"] = fetched
             f.write(json.dumps(c, ensure_ascii=False) + "\n")

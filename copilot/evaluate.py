@@ -149,7 +149,7 @@ def run(config: str, ids: list[str] | None = None, workers: int = 4, copilot: Co
         RESULTS.mkdir(parents=True, exist_ok=True)
         out = RESULTS / f"{config}.json"
         out.write_text(json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=1),
-                       encoding="utf-8")
+                       encoding="utf-8", newline="\n")
         summary["file"] = str(out.relative_to(ROOT))
     return summary
 
@@ -164,7 +164,8 @@ def rescore(config: str) -> dict:
              "score": score_one(tickets[r["id"]], r["result"])} for r in stored["rows"] if r["id"] in tickets]
     summary = summarize(rows, config)
     summary["rescored_from_stored_outputs"] = True
-    path.write_text(json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8")
+    path.write_text(json.dumps({"summary": summary, "rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8",
+                    newline="\n")
     return summary
 
 
