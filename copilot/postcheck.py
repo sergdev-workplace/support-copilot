@@ -35,8 +35,14 @@ DECISION_IN_DRAFT = [
     r"\bwe (will|'ll|shall|can) (refund|compensate|reimburse|credit you|approve|reject|unblock|unfreeze)\b",
     r"\b(you will|you'll) (receive|get) (a |your |full )?(refund|compensation|money back)\b",
     r"\b(your )?complaint (is|has been|will be) (upheld|rejected|accepted|dismissed|denied|resolved in your favou?r)\b",
-    r"(мы )?(вернём|вернем|компенсируем|одобрим|одобрили|отклонили)",
+    r"(?<!\w)(мы )?(вернём|вернем|компенсируем|одобрим|одобрили|отклонили)(?!\w)",
 ]
+# A decision phrase inside a condition, requirement or question is general guidance, not an outcome
+# for this customer: "make sure your account is verified", "if your withdrawal was rejected" (ISS-46).
+_CONDITIONAL = re.compile(
+    r"(?<!\w)(once|if|when|after|before|until|unless|make sure|ensure|whether|why|"
+    r"если|когда|после|как только|пока|убедитесь|почему)(?!\w)", re.IGNORECASE)
+_SENTENCE_START = re.compile(r"[.!?\n][^.!?\n]*$")
 DECISION_TIMELINE_IN_DRAFT = [
     r"\b(will be|is going to be) (resolved|decided|approved|refunded|completed) (by|before|within|on)\b",
     r"\b(by|before|until) (monday|tuesday|wednesday|thursday|friday|saturday|sunday|tomorrow|next week|the end of)\b",
@@ -57,7 +63,16 @@ def has_advice(*texts: str) -> bool:
 
 def has_decision(*texts: str, include_timelines: bool = True) -> bool:
     patterns = _DECISION + (_DECISION_TIMELINE if include_timelines else [])
-    return any(p.search(t) for t in texts if t for p in patterns)
+    for t in texts:
+        for p in patterns:
+            for m in p.finditer(t or ""):
+                before = t[:m.start()]
+                start = _SENTENCE_START.search(before)
+                clause = before[start.start() + 1:] if start else before
+                if p in _DECISION and _CONDITIONAL.search(clause):
+                    continue
+                return True
+    return False
 
 
 # ---------------------------------------------------------------- facts (numbers, durations)
@@ -255,7 +270,8 @@ def check(out: LLMOutput, ticket_text: str, holding_required: bool) -> tuple[LLM
 
     # Specialist cases use fixed acknowledgements: regexes cannot cover every way of deciding
     # a case (for example, "we found against you"). Never retain a free-form holding reply.
-    if holding_required or out.answer_mode == "holding_reply":
+    # A decline of trading advice stays a decline (ISS-38, ISS-46); the router still escalates the case.
+    if (holding_required and out.answer_mode != "decline_trading_advice") or out.answer_mode == "holding_reply":
         holding_text, _ = templates.get("holding", out.classification.language)
         if out.answer_mode != "holding_reply" or out.draft_reply != holding_text:
             actions.append("specialist decision needed -> holding template")

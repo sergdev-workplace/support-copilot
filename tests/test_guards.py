@@ -383,3 +383,37 @@ def test_iss38_partial_answer_goes_to_an_agent():
     r = triage_with(partial, "What is the minimum deposit, and do you accept Skrill?")
     assert r.answer_mode == "answer" and r.route == "agent_answer"
     assert any(x.startswith("partial answer") for x in r.reasons)
+
+
+# ISS-46: outcome detection on every draft must not flag general guidance.
+@pytest.mark.parametrize("text", [
+    "Yes, please make sure your account is verified before withdrawing.",
+    "Once your account has been verified, you can withdraw.",
+    "If your withdrawal was rejected, check the account details.",
+    "Если ваш вывод отклонили, проверьте реквизиты.",
+    "Почему отклонили вывод? Причины: неверные реквизиты.",
+])
+def test_iss46_conditional_guidance_is_not_an_outcome(text):
+    assert not postcheck.has_decision(text, include_timelines=False)
+
+
+@pytest.mark.parametrize("text", ["Your account is now verified.", "Мы одобрили ваш вывод.",
+                                  "Good news: your withdrawal has been approved."])
+def test_iss46_real_outcomes_still_caught(text):
+    assert postcheck.has_decision(text, include_timelines=False)
+
+
+def test_iss46_t57_answer_is_not_escalated():
+    draft = ("Yes, please make sure your account is verified before withdrawing. Withdrawal requests "
+             "may be rejected if the account has not been verified.")
+    r = triage_with(out(classification=cls("withdrawal"), draft_reply=draft,
+                        citations=["withdraw#why-was-my-withdrawal-request-rejected"]),
+                    "Do I need to be verified before I can withdraw?")
+    assert r.answer_mode == "answer" and r.route != "escalate"
+
+
+def test_iss46_decline_survives_a_specialist_case():
+    r = triage_with(out(classification=cls("complaint"), answer_mode="decline_trading_advice",
+                        draft_reply=postcheck.DECLINE_TEMPLATE),
+                    "I want to file a formal complaint. Also, should I buy gold now?")
+    assert r.answer_mode == "decline_trading_advice" and r.route == "escalate"
